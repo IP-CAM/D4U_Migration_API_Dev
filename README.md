@@ -27,7 +27,10 @@ find and display it on your E-Commerce.
 
 
 <h3 align="left">Config File</h3>
-Config File ``` /system/library/api4u/config.php ``` holds the API connectivity information and other defines
+Config File 
+``` 
+/system/library/api4u/config.php 
+``` holds the API connectivity information and other defines
 that our extension is using around. 
 
 
