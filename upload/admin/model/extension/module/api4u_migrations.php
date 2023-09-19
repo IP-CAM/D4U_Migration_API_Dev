@@ -37,6 +37,7 @@ class ModelExtensionModuleApi4uMigrations extends Model
     //Up
     public function createLogRequestUp()
     {
+        usleep(rand(100000, 200000));
         $SQL = "CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "log_request` (
                     `id` INT(11) NOT NULL AUTO_INCREMENT,
                     `url` VARCHAR(255) NOT NULL COLLATE 'utf8mb4_unicode_520_ci',
@@ -236,6 +237,7 @@ class ModelExtensionModuleApi4uMigrations extends Model
     //Down
     public function createLogRequestDown()
     {
+        usleep(rand(100000, 200000));
         $SQL = "DROP TABLE IF EXISTS`" . DB_PREFIX . "log_request`;";
         db_query_handler($this->db, $SQL, 0, 0);
     }
