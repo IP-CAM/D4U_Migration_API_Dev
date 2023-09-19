@@ -10,6 +10,7 @@ image/cache/
 system/cache/
 system/logs/
 
+upload/system/library/api4u/config.php
 system/storage/
 
 # vQmod log files
