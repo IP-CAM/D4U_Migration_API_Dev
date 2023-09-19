@@ -1,12 +1,12 @@
 ```
 
-            ██████╗ ██╗ ██████╗ ██╗████████╗ █████╗ ██╗         ██╗  ██╗    ██╗   ██╗ ██████╗ ██╗   ██╗
-            ██╔══██╗██║██╔════╝ ██║╚══██╔══╝██╔══██╗██║         ██║  ██║    ╚██╗ ██╔╝██╔═══██╗██║   ██║
-            ██║  ██║██║██║  ███╗██║   ██║   ███████║██║         ███████║     ╚████╔╝ ██║   ██║██║   ██║
-            ██║  ██║██║██║   ██║██║   ██║   ██╔══██║██║         ╚════██║      ╚██╔╝  ██║   ██║██║   ██║
-            ██████╔╝██║╚██████╔╝██║   ██║   ██║  ██║███████╗         ██║       ██║   ╚██████╔╝╚██████╔╝
-            ╚═════╝ ╚═╝ ╚═════╝ ╚═╝   ╚═╝   ╚═╝  ╚═╝╚══════╝         ╚═╝       ╚═╝    ╚═════╝  ╚═════╝ 
-            ___________________________________________________________________________________________
+                  ██████╗ ██╗ ██████╗ ██╗████████╗ █████╗ ██╗         ██╗  ██╗    ██╗   ██╗ ██████╗ ██╗   ██╗
+                  ██╔══██╗██║██╔════╝ ██║╚══██╔══╝██╔══██╗██║         ██║  ██║    ╚██╗ ██╔╝██╔═══██╗██║   ██║
+                  ██║  ██║██║██║  ███╗██║   ██║   ███████║██║         ███████║     ╚████╔╝ ██║   ██║██║   ██║
+                  ██║  ██║██║██║   ██║██║   ██║   ██╔══██║██║         ╚════██║      ╚██╔╝  ██║   ██║██║   ██║
+                  ██████╔╝██║╚██████╔╝██║   ██║   ██║  ██║███████╗         ██║       ██║   ╚██████╔╝╚██████╔╝
+                  ╚═════╝ ╚═╝ ╚═════╝ ╚═╝   ╚═╝   ╚═╝  ╚═╝╚══════╝         ╚═╝       ╚═╝    ╚═════╝  ╚═════╝ 
+                  ___________________________________________________________________________________________
 
 ```
                                      
@@ -33,7 +33,7 @@ that our extension is using around, in functions and statements.
 
 > Unique API security code <code>define('API_CODE_0', '');</code> 
 
-> Uncomment and use if there is secondary API <code>// define('API_CODE_1', '');</code> 
+> Uncomment and use if it's multi-store <code>// define('API_CODE_1', '');</code> 
 
 > ERP App name <code>define('API_APP_NAME', '');</code> 
 
@@ -49,11 +49,21 @@ that our extension is using around, in functions and statements.
 
 > In case API works with POST (true) or GET (false) <code>define('IS_POST_OR_GET', false);</code>
 
-> API URL and Port connection (i.e. `'http://123.456.789:1234'`) <code>define('API_URL', '');</code>
+> API URL and Port connection (i.e. `'http://ip:port'`) <code>define('API_URL', '');</code>
+
+> Enable/Disable JSON Decode for returned Products, if needed or broke something <code>define('JSON_DECODE_PRODUCT', true);</code>
 
 <br />
 
 ## Data Mapping
+Each ERP API has it's own data fields. These fields mostly are translated - getting names close to client. In order to fetch and
+store the data we have to translate it also in OpenCart's 'language'. This kind of action it gets into `/system/library/api4u/product.php` 
+at `integrateProduct()` function, i.e. if we have just the . 
+
+1. We have to find/analyze the values that client and ERP returns, on JSON/Array/List at the API we GET/POST through.
+2. Then we can see the data structure to define which name/field has values stored at, i.e. `"Data":[{values}]` (here is "Data") or i.e. `"Data":{"Items":[{values}]}` / `"Data":{"AlterCodes":[{values}]}` (here is "Items"/"AlterCodes") etc.
+3. Next we use the field/name that includes the values/data and replace it on `"entitycode" => "field/name",` inside `$data_array['get_products']`.
+4. At last we declare the pointed array data onto `$productsDetails` (i.e. `$productDetails = $response['Data']['Items']`), so it can check the data and proceed to the integration if exists.
 
 
 
