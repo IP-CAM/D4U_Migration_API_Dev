@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <id><![CDATA[API4U functionalities]]></id>
+    <name><![CDATA[API4U functionalities]]></name>
+    <code>api4u-add-functionalities-logic</code>
+    <version>1.0.0</version>
+    <author>digital4u - Api4u</author>
+    <link>https://www.digital4u.gr/</link>
+    <file path="system/library/db/mysqli.php" error="log">
+        <operation error="skip">
+            <search><![CDATA[public function query($sql) {]]></search>
+            <add position="before"><![CDATA[
+        // Api4u: api4u_add_transaction_logic.xml (start) <<
+		public function beginTransaction(int $flags = 1, ?string $name = null) {
+			if ($flags > 0 && isset($name)){
+				return $this->connection->begin_transaction($flags, $name);
+			}
+			else{
+				return $this->connection->begin_transaction();
+			}
+		}
+		public function rollbackTransaction(int $flags = 0, ?string $name = null) {
+			if ($flags > 0 && isset($name)){
+				return $this->connection->rollback($flags, $name);
+			}
+			else{
+				return $this->connection->rollback();
+			}
+		}
+
+		public function commitTransaction(int $flags = 0, ?string $name = null){
+			if ($flags > 0 && isset($name)){
+				return $this->connection->commit($flags, $name);
+			}
+			else{
+				return $this->connection->commit();
+			}
+		}
+		// Api4u: api4u_add_transaction_logic.xml (end) <<
+			]]></add>
+        </operation>
+    </file>
+    <file path="system/library/db.php" error="log">
+        <operation error="skip">
+            <search><![CDATA[throw new \Exception('Error: Could not load database adaptor ' . $adaptor . '!');]]></search>
+            <add position="after" offset="2"><![CDATA[
+	// Api4u: api4u_add_transaction_logic.xml (start) <<
+	/**
+	 *throw new \Exception('Error: Could not load database adaptor ' . $adaptor . '!');
+	 *
+	 * @return	bool
+	 */
+	public function beginTransaction(int $flags = 0, ?string $name = null) {
+		return $this->adaptor->beginTransaction($flags, $name);
+	}
+
+	/**
+	 *
+	 *
+	 * @return	bool
+	 */
+	public function rollbackTransaction(int $flags = 0, ?string $name = null) {
+		return $this->adaptor->rollbackTransaction($flags, $name);
+	}
+
+	/**
+	 *
+	 *
+	 * @return	bool
+	 */
+	public function commitTransaction(int $flags = 0, ?string $name = null) {
+		return $this->adaptor->commitTransaction($flags, $name);
+	}
+	// Api4u: api4u_add_transaction_logic.xml (end) <<
+			]]></add>
+        </operation>
+    </file>
+    <file path="catalog/controller/checkout/success.php" error="log">
+        <operation error="skip">
+            <search><![CDATA[unset($this->session->data['shipping_method']);]]></search>
+            <add position="before"><![CDATA[
+	// Api4u: api4u_on_success_send_order.xml (start) <<
+            if ($this->session->data['order_id'] != '')
+            {
+                require(DIR_SYSTEM . 'library/api4u/common_functions.php');
+                require_once(DIR_APPLICATION . 'controller/extension/api4u/post_order.php');
+                $api4u = new ControllerExtensionApi4uPostOrder($this->registry);
+                $api4u->index($activity_data, $this->session->data['order_id']);
+            }
+	// Api4u: api4u_on_success_send_order.xml (end) <<
+			]]></add>
+        </operation>
+    </file>
+    <file path="catalog/controller/product/category.php" error="log">
+        <operation error="skip">
+            <search><![CDATA[$filter_data['mfp_enabled'] = true;]]></search>
+            <add position="after"><![CDATA[
+	// Api4u: api4u_filter_multi-color.xml (start) <<
+    preg_match('/\[.*?\]/', $url, $output_array);
+    if(empty($output_array))
+    {
+        $filter_id = null;
+    }
+    else
+    {
+        $filter_id = trim(trim($output_array[0], '['), ']');
+    }
+	// Api4u: api4u_filter_multi-color.xml (end) <<
+			]]></add>
+        </operation>
+
+        <operation error="skip">
+            <search><![CDATA[$product_total = $this->model_catalog_product->getTotalProducts($filter_data);]]></search>
+            <add position="replace"><![CDATA[
+	// Api4u: api4u_filter_multi-color.xml (start) <<
+	                    $product_total = $this->model_catalog_product->getTotalProducts($filter_data, $filter_id);
+	// Api4u: api4u_filter_multi-color.xml (end) <<
+			]]></add>
+        </operation>
+
+        <operation error="skip">
+            <search><![CDATA[$results = $this->model_catalog_product->getProducts($filter_data);]]></search>
+            <add position="replace"><![CDATA[
+	// Api4u: api4u_filter_multi-color.xml (start) <<
+            $results = $this->model_catalog_product->getProducts($filter_data, $filter_id);
+	// Api4u: api4u_filter_multi-color.xml (end) <<
+			]]></add>
+        </operation>
+    </file>
+    <file path="catalog/model/catalog/product.php" error="log">
+        <operation error="skip">
+            <search><![CDATA[public function getProducts($data = array()) {]]></search>
+            <add position="replace"><![CDATA[
+	// Api4u: api4u_filter_multi-color.xml (start) <<
+            public function getProducts($data = array(), $filter_id = null) {
+	// Api4u: api4u_filter_multi-color.xml (end) <<
+			]]></add>
+        </operation>
+
+        <operation error="skip">
+            <search><![CDATA[public function getTotalProducts($data = array()) {]]></search>
+            <add position="replace"><![CDATA[
+	// Api4u: api4u_filter_multi-color.xml (start) <<
+            public function getTotalProducts($data = array(), $filter_id = null) {
+	// Api4u: api4u_filter_multi-color.xml (end) <<
+			]]></add>
+        </operation>
+    </file>
+    <file path="system/library/liveopencart/ext/poip_options_like_products.php" error="log">
+        <operation error="skip">
+            <search><![CDATA[public function getSQLForOptionsLikeProducts($caller = '') {]]></search>
+            <add position="replace"><![CDATA[
+        # Api4u: api4u_filter_multi-color_query.xml (start) <<
+            public function getSQLForOptionsLikeProducts($caller = '', $filter_id = null) {
+        # Api4u: api4u_filter_multi-color_query.xml (end) <<
+			]]></add>
+        </operation>
+
+        <operation error="skip">
+            <search><![CDATA[public function modifySQLForOptionsLikeProducts($sql, $caller = '') {]]></search>
+            <add position="replace"><![CDATA[
+        # Api4u: api4u_filter_multi-color_query.xml (start) <<
+            public function modifySQLForOptionsLikeProducts($sql, $caller = '', $filter_id = null) {
+        # Api4u: api4u_filter_multi-color_query.xml (end) <<
+			]]></add>
+        </operation>
+
+        <operation error="skip">
+            <search><![CDATA[$sql_product = $this->getSQLForOptionsLikeProducts($caller);]]></search>
+            <add position="replace"><![CDATA[
+        # Api4u: api4u_filter_multi-color_query.xml (start) <<
+            $sql_product = $this->getSQLForOptionsLikeProducts($caller, $filter_id);
+        # Api4u: api4u_filter_multi-color_query.xml (end) <<
+			]]></add>
+        </operation>
+
+        <operation error="skip">
+            <search><![CDATA[$sql_table_source = "]]></search>
+            <add position="before"><![CDATA[
+        # Api4u: api4u_filter_multi-color_query.xml (start) <<
+            $where_condition = !isset($filter_id) || !$filter_id ? "" : "AND POV.api_filter_id IN (" . $filter_id . ")";
+        # Api4u: api4u_filter_multi-color_query.xml (end) <<
+			]]></add>
+        </operation>
+
+        <operation error="skip">
+            <search><![CDATA[LEFT JOIN (]]></search>
+            <add position="replace"><![CDATA[
+	                # Api4u: api4u_filter_multi-color_query.xml (start) <<
+	                  INNER JOIN (
+	                # Api4u: api4u_filter_multi-color_query.xml (end) <<
+			]]></add>
+        </operation>
+
+        <operation error="skip">
+            <search><![CDATA[AND POV.quantity > 0]]></search>
+            <add position="after"><![CDATA[
+	                # Api4u: api4u_filter_multi-color_query.xml (start) <<
+	                  $where_condition
+	                # Api4u: api4u_filter_multi-color_query.xml (end) <<
+			]]></add>
+        </operation>
+    </file>
+    <file path="admin/controller/sale/order.php" error="log">
+        <operation error="skip">
+            <search><![CDATA[$data['text_ip_add'] = sprintf($this->language->get('text_ip_add'), $this->request->server['REMOTE_ADDR']);]]></search>
+            <add position="before" offset="1"><![CDATA[
+	// Api4u: api4u_filter_multi-color.xml (start) <<
+            $this->document->addStyle('view/javascript/jquery/jquery-confirm/jquery-confirm.css');
+            $this->document->addStyle('view/stylesheet/api4u/integration.css');
+
+            $this->document->addScript('view/javascript/api4u/send_missing_order_to_erp.js');
+            $this->document->addScript('view/javascript/jquery/jquery-confirm/jquery-confirm.min.js');
+	// Api4u: api4u_filter_multi-color.xml (end) <<
+			]]></add>
+        </operation>
+    </file>
+    <file path="admin/language/el-gr/sale/order.php" error="log">
+        <operation error="skip">
+            <search><![CDATA[$_['error_filetype']             = 'Μη έγκυρος τύπος αρχείου!';]]></search>
+            <add position="before" offset="1"><![CDATA[
+	// Api4u: api4u_filter_multi-color.xml (start) <<
+            $_['send_to_erp_text']           = 'Πατήστε το κομβίο για αποστολή';
+            $_['send_to_erp']                = 'Αποστολή';
+	// Api4u: api4u_filter_multi-color.xml (end) <<
+			]]></add>
+        </operation>
+    </file>
+    <file path="admin/language/en-gb/sale/order.php" error="log">
+        <operation error="skip">
+            <search><![CDATA[$_['error_filetype']             = 'Μη έγκυρος τύπος αρχείου!';]]></search>
+            <add position="before" offset="1"><![CDATA[
+	// Api4u: api4u_filter_multi-color.xml (start) <<
+            $_['send_to_erp_text']           = 'Press the button to send order';
+            $_['send_to_erp']                = 'Send order';
+	// Api4u: api4u_filter_multi-color.xml (end) <<
+			]]></add>
+        </operation>
+    </file>
+    <file path="admin/view/template/sale/order_info.twig" error="log">
+        <operation error="skip">
+            <search><![CDATA[<li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>]]></search>
+            <add position="after" offset="2"><![CDATA[
+	{#Api4u: api4u_send_missed_orders.xml (start) <<#}
+            <div class="popup" style="float: right;margin: 2px;">
+                <span class="popuptext" id="myPopup"></span>
+            </div>
+	{#Api4u: api4u_send_missed_orders.xml (start) <<#}
+			]]></add>
+        </operation>
+
+        <operation error="skip">
+            <search><![CDATA[<td>{{ shipping_method }}</td>]]></search>
+            <add position="after" offset="2"><![CDATA[
+	{#Api4u: api4u_send_missed_orders.xml (start) <<#}
+            <tr>
+                <td><button data-toggle="tooltip" title="{{ send_to_erp_text }}" class="btn btn-info btn-xs"><i class="fa fa fa-paper-plane fa-fw"></i></button></td>
+                <td>{{ send_to_erp_text }}
+                <div id="sync-bar" style="margin-top: 1px;width: 100%!important;"></div>
+                </td>
+                <td><button type="button" class="btn btn-light  btn-sm btn-send-missed-order" style="float: right;" onclick="sendToERP()">{{ send_to_erp }}</button></td>
+            </tr>
+	{#Api4u: api4u_send_missed_orders.xml (start) <<#}
+			]]></add>
+        </operation>
+    </file>
+    <file path="catalog/view/theme/default/template/extension/payment/winbnk.twig" error="log">
+        <operation error="skip">
+            <search><![CDATA[<input type="button" onclick="$('#winbnk_payment').submit();" value="{{ button_confirm }}" id="button-confirm" class="button" />]]></search>
+            <add position="replace"><![CDATA[
+	{#Api4u: api4u_check_order.xml (start) <<#}
+            <input type="button" onclick="checkOrder();" value="{{ button_confirm }}" id="button-confirm" class="button" />
+	{#Api4u: api4u_check_order.xml (start) <<#}
+			]]></add>
+        </operation>
+
+        <operation error="skip">
+            <search><![CDATA[<script type="text/javascript">]]></search>
+            <add position="after"><![CDATA[
+	{#Api4u: api4u_check_order.xml (start) <<#}
+            function checkOrder() {
+                $.ajax({
+                  url: 'index.php?route=extension/api4u/post_order/checkProducts',
+                  type: 'post',
+                  data: $('#instalments :input'),
+                  dataType: 'json',
+                  error: function () {
+                    window.location.reload();
+                  },
+                  success: function (response) {
+                    if (!response['status'] && response['url'] != '') {
+                      window.location = response['url'];
+                    } else {
+                      $('#winbnk_payment').submit();
+                    }
+                  }
+                });
+            }
+	{#Api4u: api4u_check_order.xml (start) <<#}
+			]]></add>
+        </operation>
+    </file>
+    <file path="catalog/controller/extension/payment/cod.php" error="log">
+        <operation error="skip">
+            <search><![CDATA[$json = array();]]></search>
+            <add position="after"><![CDATA[
+	// #Api4u: api4u_check_order.xml (start) <<#}
+            require(DIR_SYSTEM . 'library/api4u/common_functions.php');
+            $this->load->model('extension/api4u/order');
+            $data['order_id'] = $this->session->data['order_id'];
+            $check_order = $this->model_extension_api4u_order->index('', 'check_order', $data);
+            if (empty($check_order))
+            {
+                $this->response->addHeader('Content-Type: application/json');
+                $json['redirect'] = $this->url->link('checkout/cart');
+                $this->response->setOutput(json_encode($json));
+                return;
+            }
+	// #Api4u: api4u_check_order.xml (start) <<#
+			]]></add>
+        </operation>
+    </file>
+</modification>

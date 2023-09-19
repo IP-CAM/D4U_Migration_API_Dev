@@ -1,0 +1,69 @@
+{{ header }}{{ column_left }}
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="pull-left">
+                <h1>{{ heading_title }}</h1>
+                <ul class="breadcrumb">
+                    {% for breadcrumb in breadcrumbs %}
+                        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="popup" style="float: right;">
+                <span class="popuptext" id="myPopup"></span>
+            </div>
+        </div>
+        <div class="container-fluid">
+            {% if error_warning %}
+                <div class="alert alert-danger alert-dismissible"><i
+                            class="fa fa-exclamation-circle"></i> {{ error_warning }}
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                </div>
+            {% endif %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="col-sm-12">
+                        <button id="sync" type="button" class="btn btn-sm btn-sync" value="submit">
+                            Synchronize
+                        </button>
+                        <div id="sync-bar" style="margin-top: 1%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+<script type="text/javascript"><!--
+$('#sync').on('click', function() {
+	  $.ajax({
+		  url: '{{ catalog }}index.php?route=api/api4u/sync&api_token={{ api_token }}',
+		  type: 'post',
+		  dataType: 'json',
+		  data: '',
+		  beforeSend: function() {
+			  $('#sync').button('loading');
+		  },
+		  complete: function() {
+			  $('#sync').button('reset');
+		  },
+		  success: function(json) {
+			  $('.alert-dismissible').remove();
+
+			  if (json['error']) {
+				  $('#sync').before('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+			  }
+
+			  if (json['success']) {
+				  $('#sync').before('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+			  }
+		  },
+		  error: function(xhr, ajaxOptions, thrownError) {
+			  alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		  }
+	  });
+  });
+  //--></script>
+    </div>
+{{ footer }}

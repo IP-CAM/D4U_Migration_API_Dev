@@ -1,0 +1,68 @@
+.progress {
+    height: 10px;
+}
+
+.progress-bar {
+    background-color: #9d9d9d;
+}
+
+.progress-bar-animated {
+    -webkit-animation: progress-bar-stripes 1s linear infinite;
+    animation: progress-bar-stripes 1s linear infinite;
+    width: 100%;
+}
+
+.progress-striped .progress-bar, .progress-bar-striped {
+    background-size: 10px 10px;
+}
+
+.btn-sync {
+    display: block;
+    margin: auto;
+    color: #ffffff;
+    background-color: #9d9d9d;
+}
+
+.popup {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.popup .popuptext {
+    visibility: hidden;
+    background-color: #9d9d9d;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px;
+    z-index: 1;
+}
+
+.popup .show {
+    visibility: visible;
+    -webkit-animation: fadeIn 1s;
+    animation: fadeIn 1s;
+}
+
+@-webkit-keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}

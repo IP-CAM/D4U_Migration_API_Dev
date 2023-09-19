@@ -1,0 +1,8 @@
+******* 15/09/2023 *******
+Author: Mihail Llaftiu
+Path: upload/admin/model/extention/module/api4u_migrations.php
+Changes: 	Functions have arrays of (`{$category}`, `{$column}`, `{$query}`)
+		Function runQueries() -> create an overall function that runs all the queries
+		Function that runs per each query and check if column exists. Run only in case that column doesn't exists or it's a drop query. 
+
+
