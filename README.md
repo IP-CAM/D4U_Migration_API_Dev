@@ -16,7 +16,7 @@
 
 - [Description](#description)
 - [Config File](#config-file)
-- Data Mapping
+- [Data Mapping](#data-mapping)
 <br />  
 
 ## Description
@@ -28,7 +28,7 @@ find and display it on your E-Commerce.
 
 ## Config File
 Config File <code>/system/library/api4u/config.php</code> holds the API connectivity information and other defines
-that our extension is using around.
+that our extension is using around, in functions and statements.
 <br />
 
 > Unique API security code <code>define('API_CODE_0', '');</code> 
@@ -48,6 +48,12 @@ that our extension is using around.
 > In case API needs token for login <code>define('NEEDS_LOGIN_TOKEN', '');</code>
 
 > In case API works with POST (true) or GET (false) <code>define('IS_POST_OR_GET', false);</code>
+
+> API URL and Port connection (i.e. `'http://123.456.789:1234'`) <code>define('API_URL', '');</code>
+
+<br />
+
+## Data Mapping
 
 
 
