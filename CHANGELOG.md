@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 + Function runQueries() -> create an overall function that runs all the queries.
 + Function that runs per each query and check if column exists. Run only in case that column doesn't exists or it's a drop query. 
 + Usleep on each $SQL query, protecting MySQL from getting down/broke.
+
 * 
 
 ### Changed
