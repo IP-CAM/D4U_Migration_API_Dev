@@ -86,7 +86,6 @@ at `integrateProduct()` function, i.e. if we have just the .
   | $tax_class_id | Product's Tax/VAT class |
   | $name | Product's Title/Name |
   | $description | Product's Description/Details |
-  | $description | Product's Description/Details |
 
 
 
