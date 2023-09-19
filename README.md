@@ -1,5 +1,4 @@
-<p align="center">
-  ```
+```
   ____   __    ___   __   ____   __   __              ___          _  _   __   _  _ 
  (    \ (  )  / __) (  ) (_  _) / _\ (  )            / _ \        ( \/ ) /  \ / )( \
   ) D  | )(  ( (_ \  )(    )(  /    \/ (_/\         (__  (         )  / (  O )) \/ (
@@ -7,7 +6,6 @@
  ___________________________________________________________________________________
 
 ```
-</p>
                                                                                                                                                                                   
 # d4u_migration_api #
 An OpenCart extention that helps your connect the E-Commerce to ERP(s) and fetch/migrate data.
