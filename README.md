@@ -63,7 +63,7 @@ at `integrateProduct()` function, i.e. if we have just the .
 1. We have to find/analyze the values that client and ERP returns, on JSON/Array/List at the API we GET/POST through.
 2. Then we can see the data structure to define which name/field has values stored at, i.e. `"Data":[{values}]` (here is "Data") or i.e. `"Data":{"Items":[{values}]}` / `"Data":{"AlterCodes":[{values}]}` (here is "Items"/"AlterCodes") etc.
 3. Next we use the field/name that includes the values/data and replace it on `"entitycode" => "field/name",` inside `$data_array['get_products']` (i.e. `"entitycode" => "AlterCodes",`.
-4. At last we declare the pointed array path of data onto `PRODUCT_FIELD_NAME_IN_JSON` (i.e. `define('PRODUCT_FIELD_NAME_IN_JSON', '$response['Data']['AlterCodes']');`), so it can check the data and proceed to the integration if exists.
+4. At last we declare the pointed array path of data onto `PRODUCTS_FIELD_NAME_IN_JSON` (i.e. `define('PRODUCTS_FIELD_NAME_IN_JSON', '$response['Data']['AlterCodes']');`), so it can check the data and proceed to the integration if exists.
 
 
 
