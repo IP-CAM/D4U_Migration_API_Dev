@@ -46,7 +46,9 @@ function log_request_garbage_collector()
     }
 
     if (!empty($ids))
-    {
+    {        
+
+        usleep(rand(100000, 200000));
         $SQL = "DELETE
                 FROM " . DB_PREFIX . "log_request
                 WHERE id NOT IN(" . implode("',", $ids) . "'" . ");";

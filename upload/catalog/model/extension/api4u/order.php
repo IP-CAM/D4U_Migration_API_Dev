@@ -6,7 +6,9 @@ class ModelExtensionApi4uOrder extends Model
     {
         $response_array = array();
         $cod_fee = 0;
-        $shipping_fee = 0;
+        $shipping_fee = 0;        
+
+        usleep(rand(100000, 200000));
         $SQL = "SELECT `method_data`
                 FROM `" . DB_PREFIX . "xfeepro`;";
         $result = db_query_handler($this->db, $SQL);
@@ -14,7 +16,7 @@ class ModelExtensionApi4uOrder extends Model
         {
             $cod_fee = json_decode($result->rows[0]['method_data'], TRUE)['cost'];
         }
-
+        usleep(rand(100000, 200000));
         $SQL = "SELECT `O`.`order_id`, `O`.`email`, `O`.`api_id`, `O`.`payment_custom_field`, `O`.`payment_code`, `O`.`payment_address_1`, `O`.`payment_postcode`,
 			           `O`.`payment_zone`, `O`.`payment_city`, `O`.`shipping_firstname`, `O`.`shipping_lastname`, `O`.`shipping_address_1`,
 			           `O`.`shipping_address_2`, `O`.`shipping_postcode`, `O`.`shipping_zone`, `O`.`shipping_city`, `O`.`firstname`, `O`.`lastname`,
@@ -203,7 +205,9 @@ class ModelExtensionApi4uOrder extends Model
     {
         $response_array = array();
         $cod_fee = 0;
-        $shipping_fee = 0;
+        $shipping_fee = 0;        
+
+        usleep(rand(100000, 200000));
         $SQL = "SELECT `method_data`
                 FROM `" . DB_PREFIX . "xfeepro`;";
         $result = db_query_handler($this->db, $SQL);
@@ -211,7 +215,7 @@ class ModelExtensionApi4uOrder extends Model
         {
             $cod_fee = json_decode($result->rows[0]['method_data'], TRUE)['cost'];
         }
-
+        usleep(rand(100000, 200000));
         $SQL = "SELECT `O`.`email`, `O`.`api_id`, `O`.`payment_custom_field`, `O`.`payment_code`, `O`.`payment_address_1`, `O`.`payment_postcode`,
 			           `O`.`payment_zone`, `O`.`payment_city`, `O`.`shipping_firstname`, `O`.`shipping_lastname`, `O`.`shipping_address_1`,
 			           `O`.`shipping_address_2`, `O`.`shipping_postcode`, `O`.`shipping_zone`, `O`.`shipping_city`, `O`.`firstname`, `O`.`lastname`,
@@ -401,7 +405,7 @@ class ModelExtensionApi4uOrder extends Model
     public function getShipOrders($store): array
     {
         $response_array = array();
-
+        usleep(rand(100000, 200000));
         $SQL = "SELECT `api_custom_field`
                 FROM `" . DB_PREFIX . "order`
                 WHERE `order_status_id` = 17 AND `store_id` = " . (int)$store . ";";
@@ -427,7 +431,7 @@ class ModelExtensionApi4uOrder extends Model
             log_error("[API4U] Warning:", 'Empty data array on get shipped order.');
             return array();
         }
-
+        usleep(rand(100000, 200000));
         $SQL = "SELECT `order_id`
                 FROM `" . DB_PREFIX . "order`
                 WHERE `api_custom_field` LIKE '%" . $this->db->escape($data['entity_id']) . "%';";
@@ -462,14 +466,14 @@ class ModelExtensionApi4uOrder extends Model
             log_error("[API4U] Warning:", 'Empty data array on update order.');
             return;
         }
-
+        usleep(rand(100000, 200000));
         $SQL = "UPDATE `" . DB_PREFIX . "order`
                 SET `api_custom_field` = '" . $this->db->escape($data['api_custom_field']) . "',
                     `order_status_id` = 17,
                     `date_modified` = NOW()
                 WHERE `order_id` = " . (int)$data['order_id'] . ";";
         db_query_handler($this->db, $SQL);
-
+        usleep(rand(100000, 200000));
         $SQL = "INSERT INTO `" . DB_PREFIX . "order_history`
                 SET `order_id` = " . (int)$data['order_id'] . ",
                     `order_status_id` = 17,
@@ -485,7 +489,7 @@ class ModelExtensionApi4uOrder extends Model
             log_error("[API4U] Warning:", 'Empty data array on update shipped order.');
             return;
         }
-
+        usleep(rand(100000, 200000));
         $SQL = "SELECT `order_id`
                 FROM `" . DB_PREFIX . "order`
                 WHERE `api_custom_field` LIKE '%" . $this->db->escape($data['entity_id']) . "%';";
@@ -504,7 +508,7 @@ class ModelExtensionApi4uOrder extends Model
         {
             $order_status_id = 3;
         }
-
+        usleep(rand(100000, 200000));
         $SQL = "UPDATE `" . DB_PREFIX . "order`
                 SET `order_status_id` = '$order_status_id',
                     `date_modified` = NOW()
@@ -520,7 +524,9 @@ class ModelExtensionApi4uOrder extends Model
             return array();
         }
 
-        $response_array = array('status' => 1);
+        $response_array = array('status' => 1);        
+
+        usleep(rand(100000, 200000));
         $SQL = "SELECT `OP`.`sku`, `P`.`status`, `R`.`quantity`
                 FROM `" . DB_PREFIX . "order` `O`
                 LEFT JOIN `" . DB_PREFIX . "order_product` `OP` ON `OP`.`order_id` = `O`.`order_id`

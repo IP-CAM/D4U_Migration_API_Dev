@@ -256,7 +256,7 @@ class ModelExtensionApi4uRelatedOption extends Model
 
         $variant = "color+size";
         $last_inserted_id = 0;
-
+        usleep(rand(100000, 200000));
         $SQL = "SELECT `relatedoptions_variant_id`
                 FROM `" . DB_PREFIX . "relatedoptions_variant` 
                 WHERE `relatedoptions_variant_name` = '" . $this->db->escape($variant) . "';";

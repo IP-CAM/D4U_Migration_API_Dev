@@ -73,7 +73,10 @@ function insertUpdateValues($db, $SQL, $SQL_INSERT_VALUES, $table, $on_duplicate
     else
     {
         $on_duplicate_value = $on_duplicate_value != '' ? 'ON DUPLICATE KEY UPDATE ' . $on_duplicate_value : '';
-        $SQL_INSERT_VALUES = rtrim($SQL_INSERT_VALUES, ',');
+        usleep(rand(100000, 200000));
+        $SQL_INSERT_VALUES = rtrim($SQL_INSERT_VALUES, ',');        
+
+        usleep(rand(100000, 200000));
         $SQL .= $SQL_INSERT_VALUES . $on_duplicate_value;
         db_query_handler($db, $SQL, true);
     }

@@ -132,7 +132,8 @@ class ModelExtensionApi4uCategory extends Model
             }
         }
 
-        //Remove parent id from column `api_custom_field`.
+        //Remove parent id from column `api_custom_field`.        
+        usleep(rand(100000, 200000));
         $SQL = "SELECT `category_id`, `api_custom_field`
                 FROM `" . DB_PREFIX . "category`
                 WHERE `api_custom_field` <> '';";
@@ -222,7 +223,9 @@ class ModelExtensionApi4uCategory extends Model
 
     private function findParent($key, $val): void
     {
-        $parent = is_numeric($val) ? '`category_id`' : '`api_id`';
+        $parent = is_numeric($val) ? '`category_id`' : '`api_id`';        
+
+        usleep(rand(100000, 200000));
         $SQL = "SELECT `parent_id`
                 FROM `" . DB_PREFIX . "category`
                 WHERE $parent = '$val';";

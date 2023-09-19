@@ -497,7 +497,7 @@ class ModelExtensionApi4uProduct extends Model
             log_error('[Failed Transaction]', 'integrateProductDescription');
             exit();
         }
-
+        usleep(rand(100000, 200000));
         $SQL = null;
         foreach ($data as $value)
         {
@@ -563,7 +563,7 @@ class ModelExtensionApi4uProduct extends Model
             log_error('[Failed Transaction]', 'integrateProductsQuantityAndOptions');
             exit();
         }
-
+        usleep(rand(100000, 200000));
         $SQL = null;
         foreach ($data as $product_api_id => $value)
         {
@@ -641,7 +641,7 @@ class ModelExtensionApi4uProduct extends Model
             log_error('[Failed Transaction]', 'productsNewArrival');
             exit();
         }
-
+        usleep(rand(100000, 200000));
         $SQL = "SELECT `product_id`
                 FROM `" . DB_PREFIX . "product`
                 WHERE `api_custom_field` = " . (int)$store . " AND `date_added` > DATE_SUB(NOW(), INTERVAL 30 DAY)";
@@ -657,7 +657,7 @@ class ModelExtensionApi4uProduct extends Model
                                          LIMIT 1);";
             db_query_handler($this->db, $SQL, true);
         }
-
+        usleep(rand(100000, 200000));
         $SQL = "SELECT `product_id`
                 FROM `" . DB_PREFIX . "product`
                 WHERE `api_custom_field` = " . (int)$store . " AND `date_added` < DATE_SUB(NOW(), INTERVAL 30 DAY)";
@@ -698,9 +698,11 @@ class ModelExtensionApi4uProduct extends Model
             log_error('[Failed Transaction]', 'updateEshopActiveProducts');
             exit();
         }
-
+        usleep(rand(100000, 200000));
         $SQL = null;
-        usleep(rand(100000, 250000));
+        usleep(rand(100000, 250000));        
+
+        usleep(rand(100000, 200000));
         $SQL = "UPDATE `" . DB_PREFIX . "product`
                 SET `status` = 0
                 WHERE `api_custom_field` = " . (int)$store . " AND api_id NOT IN ($data[0])";
