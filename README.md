@@ -64,6 +64,31 @@ at `integrateProduct()` function, i.e. if we have just the .
 2. Then we can see the data structure to define which name/field has values stored at, i.e. `"Data":[{values}]` (here is "Data") or i.e. `"Data":{"Items":[{values}]}` / `"Data":{"AlterCodes":[{values}]}` (here is "Items"/"AlterCodes") etc.
 3. Next we use the field/name that includes the values/data and replace it on `"entitycode" => "field/name",` inside `$data_array['get_products']` (i.e. `"entitycode" => "AlterCodes",`.
 4. At last we declare the pointed array path of data onto `PRODUCTS_FIELD_NAME_IN_JSON` (i.e. `define('PRODUCTS_FIELD_NAME_IN_JSON', '$response['Data']['AlterCodes']');`), so it can check the data and proceed to the integration if exists.
+5. In the end you have to map the variables (i.e. `$special_price`, `$price`, etc) with the value of the relative Product's Array/JSON values (i.e. `$price = $value['RETAILPRICE']`, `$price = $value['INITIALRTLPRICE']`)
+6. Most important Mapping variables to be filled with data, for a completed migration:
+
+  | Variable | Data Value Expect |
+  | --- | --- |
+  | $sku | Product's SKU |
+  | $upc | Product's UPC |
+  | $ean | Product's EAN |
+  | $jan | Product's JAN |
+  | $isbn | Product's ISBN |
+  | $mpn | Product's MPN |
+  | $location | Product's AREA where it has/not extra Delivery costs |
+  | $quantity | Product's Stock Quantity |
+  | $stock_status_id | Depending on Product's Stock Quantity decide the Availability Text/Label (by ID) |
+  | $image | Product's Image file Name |
+  | $manufacturer_id | Product's Manufacturer based on it's ID |
+  | $shipping | Product's Shipping availability, if it's available or not |
+  | $price | Product's Price, will be the Discount Price if exists otherwise just the Price |
+  | $special_price | Product's Price, will be the previous Price before the discount otherwise zero |
+  | $tax_class_id | Product's Tax/VAT class |
+  | $name | Product's Title/Name |
+  | $description | Product's Description/Details |
+  | $description | Product's Description/Details |
+
+
 
 
 
