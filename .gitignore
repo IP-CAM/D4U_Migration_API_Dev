@@ -19,3 +19,4 @@ vqmod/logs/*
 vqmod/vqcache/*
 vqmod/checked.cache
 vqmod/mods.cache
+upload/system/library/api4u/config.php
