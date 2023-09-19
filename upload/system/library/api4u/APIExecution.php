@@ -1,7 +1,6 @@
 <?php
 
 use Curl\Curl;
-require 'config.php';
 
 class APIExecution
 {

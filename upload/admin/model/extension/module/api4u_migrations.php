@@ -78,8 +78,12 @@ class ModelExtensionModuleApi4uMigrations extends Model
             foreach($tablesData as $datas) {
                 $columnExists = $this->checkIfColumnExists($datas);
                 //echo 'Trying<br/>';
-    
-                if($columnExists == 0 || ($columnExists == 1 && stripos($datas[2], 'DROP'))) { // If the column Doesn't exists or it's a Drop query, only then, run it
+
+                if (stripos($datas[2], 'INDEX')) {
+                    $SQL = (string) $datas[2];
+                    $SQL .= (string) " ON ". DB_PREFIX . $datas[0];
+                    $SQL .= ";";
+                } else if($columnExists == 0 || ($columnExists == 1 && stripos($datas[2], 'DROP'))) { // If the column Doesn't exists or it's a Drop query, only then, run it
                     $SQL = "ALTER TABLE `" . DB_PREFIX . $datas[0] ."`";
                     $SQL .= (string) $datas[2];
                     $SQL .= ";";
@@ -96,7 +100,11 @@ class ModelExtensionModuleApi4uMigrations extends Model
             $columnExists = $this->checkIfColumnExists($datas);
             //echo 'Trying<br/>';
 
-            if($columnExists == 0 || ($columnExists == 1 && stripos($datas[2], 'DROP'))) { // If the column Doesn't exists or it's a Drop query, only then, run it
+            if (stripos($datas[2], 'INDEX')) {
+                $SQL = (string) $datas[2];
+                $SQL .= (string) " ON ". DB_PREFIX . $datas[0];
+                $SQL .= ";";
+            } else if($columnExists == 0 || ($columnExists == 1 && stripos($datas[2], 'DROP'))) { // If the column Doesn't exists or it's a Drop query, only then, run it
                 $SQL = "ALTER TABLE `" . DB_PREFIX . $datas[0] ."`";
                 $SQL .= $datas[2];
                 $SQL .= ";";
@@ -247,7 +255,8 @@ class ModelExtensionModuleApi4uMigrations extends Model
         $tablesData = array(
             // Update Attribute Group Table Up
             array('category', 'api_id', "DROP COLUMN `api_id`"),
-            array('category', 'api_custom_field', "DROP COLUMN `api_custom_field`")
+            array('category', 'api_custom_field', "DROP COLUMN `api_custom_field`"),
+            array('category', 'category_api_id_index', "DROP INDEX `category_api_id_index`")
         );
 
         $this->runQueries($tablesData);
@@ -257,7 +266,8 @@ class ModelExtensionModuleApi4uMigrations extends Model
     {
         $tablesData = array(
             // Update Attribute Group Table Up
-            array('attribute_group', 'api_id', "DROP COLUMN `api_id`")
+            array('attribute_group', 'api_id', "DROP COLUMN `api_id`"),
+            array('attribute_group', 'attribute_group_api_id_index', "DROP INDEX `attribute_group_api_id_index`")
         );
 
         $this->runQueries($tablesData);
@@ -267,7 +277,8 @@ class ModelExtensionModuleApi4uMigrations extends Model
     {
         $tablesData = array(
             // Update Attribute Group Table Up
-            array('attribute', 'api_id', "DROP COLUMN `api_id`")
+            array('attribute', 'api_id', "DROP COLUMN `api_id`"),
+            array('attribute', 'attribute_api_id_index', "DROP INDEX `attribute_api_id_index`")
         );
 
         $this->runQueries($tablesData);
@@ -277,7 +288,8 @@ class ModelExtensionModuleApi4uMigrations extends Model
     {
         $tablesData = array(
             // Update Attribute Group Table Up
-            array('filter_group', 'api_id', "DROP COLUMN `api_id`")
+            array('filter_group', 'api_id', "DROP COLUMN `api_id`"),
+            array('filter_group', 'filter_group_api_id_index', "DROP INDEX `filter_group_api_id_index`")
         );
 
         $this->runQueries($tablesData);
@@ -287,7 +299,8 @@ class ModelExtensionModuleApi4uMigrations extends Model
     {
         $tablesData = array(
             // Update Attribute Group Table Up
-            array('filter', 'api_id', "DROP COLUMN `api_id`")
+            array('filter', 'api_id', "DROP COLUMN `api_id`"),
+            array('filter', 'filter_api_id_index', "DROP INDEX `filter_api_id_index`")
         );
 
         $this->runQueries($tablesData);
@@ -297,7 +310,8 @@ class ModelExtensionModuleApi4uMigrations extends Model
     {
         $tablesData = array(
             // Update Attribute Group Table Up
-            array('option', 'api_id', "DROP COLUMN `api_id`")
+            array('option', 'api_id', "DROP COLUMN `api_id`"),
+            array('option', 'option_api_id_index', "DROP INDEX `option_api_id_index`")
         );
 
         $this->runQueries($tablesData);
@@ -307,7 +321,8 @@ class ModelExtensionModuleApi4uMigrations extends Model
     {
         $tablesData = array(
             // Update Attribute Group Table Up
-            array('option_value', 'api_id', "DROP COLUMN `api_id`")
+            array('option_value', 'api_id', "DROP COLUMN `api_id`"),
+            array('option_value', 'option_value_api_id_index', "DROP INDEX `option_value_api_id_index`")
         );
 
         $this->runQueries($tablesData);
@@ -318,7 +333,8 @@ class ModelExtensionModuleApi4uMigrations extends Model
         $tablesData = array(
             // Update Attribute Group Table Up
             array('product', 'api_id', "DROP COLUMN `api_id`"),
-            array('product', 'api_custom_field', "DROP COLUMN `api_custom_field`")
+            array('product', 'api_custom_field', "DROP COLUMN `api_custom_field`"),
+            array('product', 'product_api_id_index', "DROP INDEX `product_api_id_index`")
         );
 
         $this->runQueries($tablesData);
@@ -328,7 +344,8 @@ class ModelExtensionModuleApi4uMigrations extends Model
     {
         $tablesData = array(
             // Update Attribute Group Table Up
-            array('product_image', 'api_id', "DROP COLUMN `api_id`")
+            array('product_image', 'api_id', "DROP COLUMN `api_id`"),
+            array('product_image', 'product_image_api_id_index', "DROP INDEX `product_image_api_id_index`")
         );
 
         $this->runQueries($tablesData);
@@ -338,7 +355,8 @@ class ModelExtensionModuleApi4uMigrations extends Model
     {
         $tablesData = array(
             // Update Attribute Group Table Up
-            array('poip_option_image', 'api_id', "DROP COLUMN `api_id`")
+            array('poip_option_image', 'api_id', "DROP COLUMN `api_id`"),
+            array('poip_option_image', 'poip_image_api_id_index', "DROP INDEX `poip_image_api_id_index`")
         );
 
         $this->runQueries($tablesData);
@@ -348,7 +366,8 @@ class ModelExtensionModuleApi4uMigrations extends Model
     {
         $tablesData = array(
             // Update Attribute Group Table Up
-            array('manufacturer', 'api_id', "DROP COLUMN `api_id`")
+            array('manufacturer', 'api_id', "DROP COLUMN `api_id`"),
+            array('manufacturer', 'manufacturer_api_id_index', "DROP INDEX `manufacturer_api_id_index`")
         );
 
         $this->runQueries($tablesData);

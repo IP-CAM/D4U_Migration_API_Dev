@@ -1,5 +1,4 @@
 <?php
-require '../../../system/library/api4u/config.php';
 
 class ModelExtensionApi4uProduct extends Model
 {
