@@ -47,7 +47,7 @@ that our extension is using around.
 
 > In case API needs token for login <code>define('NEEDS_LOGIN_TOKEN', '');</code>
 
-> In case API works with POST (1) or GET (0) <code>define('IS_POST_OR_GET', 0);</code>
+> In case API works with POST (true) or GET (false) <code>define('IS_POST_OR_GET', false);</code>
 
 
 
