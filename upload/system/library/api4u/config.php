@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('error_reporting', E_ALL);
 
 //OPENCART
 define('API4U VERSION', '3.0.3.8');
@@ -13,19 +15,18 @@ define('API_DB_PASSWORD', '');
 define('API_PACKAGE_SIZE', '');
 
 //Configs
-define('NEEDS_LOGIN_TOKEN', true);
-define('IS_POST_OR_GET', false);
-define('API_URL', '');
-define('JSON_DECODE_PRODUCT', true);
-
-//Field Name of Product Data in JSON/Array
-define('PRODUCT_FIELD_NAME_IN_JSON', '');
+define('NEEDS_LOGIN_TOKEN', false);
+define('IS_POST_OR_GET', true);
+define('ERP_API_URL', '');
+define('INTEGRATE_PROCESS', array(""));
+// define('PRODUCTS_JSON_DATA_MAP_POINT', array("", ""));
+define('PRODUCTS_JSON_DATA_ENDPOINT', '');
 
 //ERP Endpoints
-define('ELOG_URL', API_URL.'/exesjson/elogin');
-define('CHECK_TOKEN_URL', API_URL.'/exesjson/checkcookie');
-define('POST_DATA_URL', API_URL.'/exesjson/postdata');
-define('GET_DATA_URL', API_URL.'/exesjson/getdata');
+define('ELOG_URL', ERP_API_URL.'/exesjson/elogin');
+define('CHECK_TOKEN_URL', ERP_API_URL.'/exesjson/checkcookie');
+define('POST_DATA_URL', ERP_API_URL.'/exesjson/postdata');
+define('GET_DATA_URL', ERP_API_URL.'/exesjson/getdata');
 
 //Token txt for token_check
 define('API4U_LIBRARY', DIR_SYSTEM . 'library/api4u/');

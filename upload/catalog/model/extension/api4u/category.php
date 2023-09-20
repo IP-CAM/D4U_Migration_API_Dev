@@ -48,7 +48,8 @@ class ModelExtensionApi4uCategory extends Model
              * If category is new, insert.
              * If category description changed, update.
              */
-            $SQL = "SELECT C.category_id
+            usleep(rand(30000, 100000));
+$SQL = "SELECT C.category_id
                     FROM " . DB_PREFIX . "category C 
                     INNER JOIN " . DB_PREFIX . "category_description CD ON CD.category_id=C.category_id
                     WHERE CD.name = '{$category_array['categoryName']}' AND C.`api_id` = '{$category_array['categoryId']}'";
@@ -57,7 +58,8 @@ class ModelExtensionApi4uCategory extends Model
             {
                 if ($row = check_existence($this->db, DB_PREFIX . 'category_description', 'name', $category_array['categoryName'], 'category_id'))
                 {
-                    $SQL = "UPDATE `" . DB_PREFIX . "category`
+                    usleep(rand(30000, 100000));
+$SQL = "UPDATE `" . DB_PREFIX . "category`
                             SET `api_id` = '" . $this->db->escape($category_array['categoryId']) . "'
                             WHERE `category_id` = '" . (int)$row['category_id'] . "';";
                     db_query_handler($this->db, $SQL, true);
@@ -66,7 +68,8 @@ class ModelExtensionApi4uCategory extends Model
 
                 $category_parent_id =
                 $top = isset($category_array['categoryParentId']) ? 0 : 1;
-                $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "category` 
+                usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "category` 
                         SET `parent_id` = 0,
                             `top` = $top, 
                             `column` = 1,
@@ -93,12 +96,14 @@ class ModelExtensionApi4uCategory extends Model
                     }
 
                     //There may be many stores. In that case we should use other logic (foreach).
-                    $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "category_to_store`
+                    usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "category_to_store`
                         SET `category_id` = " . $last_inserted_id . ",
                             `store_id` = 0;";
                     db_query_handler($this->db, $SQL);
 
-                    $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "category_to_layout`
+                    usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "category_to_layout`
                             SET `category_id` = " . $last_inserted_id . ",
                                 `store_id` = 0,
                                 `layout_id` = 0;";
@@ -106,7 +111,8 @@ class ModelExtensionApi4uCategory extends Model
                 }
                 else
                 {
-                    $SQL = "SELECT `C`.`category_id`
+                    usleep(rand(30000, 100000));
+$SQL = "SELECT `C`.`category_id`
                             FROM " . DB_PREFIX . "category C
                             WHERE `C`.`api_id` = '{$category_array['categoryId']}'";
                     $result = db_query_handler($this->db, $SQL, true);
@@ -117,7 +123,8 @@ class ModelExtensionApi4uCategory extends Model
                 {
                     $foreign_name = isset($category_array['categoryForeignName']) ? $category_array['categoryForeignName'] : $category_array['categoryName'];
                     $language_name = $key == 0 ? $foreign_name : $category_array['categoryName'];
-                    $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "category_description`
+                    usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "category_description`
                             SET `category_id` = $last_inserted_id,
                                 `language_id` = " . (int)$id . ",
                                 `name` = '" . $this->db->escape($language_name) . "',
@@ -133,21 +140,23 @@ class ModelExtensionApi4uCategory extends Model
         }
 
         //Remove parent id from column `api_custom_field`.        
-        usleep(rand(100000, 200000));
-        $SQL = "SELECT `category_id`, `api_custom_field`
+          usleep(rand(30000, 100000));
+$SQL = "SELECT `category_id`, `api_custom_field`
                 FROM `" . DB_PREFIX . "category`
                 WHERE `api_custom_field` <> '';";
         $result = db_query_handler($this->db, $SQL, true);
         foreach ($result->rows as $row)
         {
-            $SQL = "SELECT `category_id`
+            usleep(rand(30000, 100000));
+$SQL = "SELECT `category_id`
                     FROM `" . DB_PREFIX . "category`
                     WHERE `api_id` = '" . $this->db->escape($row['api_custom_field']) . "';";
             $result2 = db_query_handler($this->db, $SQL, true);
             if ($result2->num_rows)
             {
                 $parent_category_id = (int)$result2->row['category_id'];
-                $SQL = "UPDATE `" . DB_PREFIX . "category`
+                usleep(rand(30000, 100000));
+$SQL = "UPDATE `" . DB_PREFIX . "category`
                         SET `parent_id` = {$parent_category_id},
                             `api_custom_field` = ''
                         WHERE `category_id` = '" . $this->db->escape($row['category_id']) . "';";
@@ -185,7 +194,8 @@ class ModelExtensionApi4uCategory extends Model
 
                 if (isset($parent_query))
                 {
-                    $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "category_path` (`category_id`, `path_id`, `level`) VALUES
+                    usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "category_path` (`category_id`, `path_id`, `level`) VALUES
                             (
                                 (
                                     SELECT `category_id`
@@ -204,6 +214,7 @@ class ModelExtensionApi4uCategory extends Model
         if (!$transaction_commit)
         {
             log_error('[Failed Transaction Commit]', 'integrateCategory');
+            $this->db->close();
             exit();
         }
     }
@@ -225,8 +236,8 @@ class ModelExtensionApi4uCategory extends Model
     {
         $parent = is_numeric($val) ? '`category_id`' : '`api_id`';        
 
-        usleep(rand(100000, 200000));
-        $SQL = "SELECT `parent_id`
+          usleep(rand(30000, 100000));
+$SQL = "SELECT `parent_id`
                 FROM `" . DB_PREFIX . "category`
                 WHERE $parent = '$val';";
         $result = db_query_handler($this->db, $SQL, true);

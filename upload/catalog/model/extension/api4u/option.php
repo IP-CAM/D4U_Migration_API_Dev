@@ -34,6 +34,7 @@ class ModelExtensionApi4uOption extends Model
         if (!$transaction)
         {
             log_error('[Failed Transaction]', 'integrateOption');
+            $this->db->close();
             exit();
         }
 
@@ -54,7 +55,8 @@ class ModelExtensionApi4uOption extends Model
              * If option description changed, update.
              */
             $sort_order = $option_array['sortOrder'] ?? 0;
-            $SQL = "SELECT O.`option_id`
+            usleep(rand(30000, 100000));
+$SQL = "SELECT O.`option_id`
                     FROM `" . DB_PREFIX . "option` O 
                     INNER JOIN `" . DB_PREFIX . "option_description` OD ON OD.`option_id` = O.`option_id`
                     WHERE OD.`name` = '" . $this->db->escape($option_array['optionName']) . "' AND O.`api_id` = '" . $this->db->escape($option_array['optionId']) . "';";
@@ -63,14 +65,16 @@ class ModelExtensionApi4uOption extends Model
             {
                 if ($row = check_existence($this->db, DB_PREFIX . 'option_description', 'name', $option_array['optionName'], 'option_id'))
                 {
-                    $SQL = "UPDATE `" . DB_PREFIX . "option`
+                    usleep(rand(30000, 100000));
+$SQL = "UPDATE `" . DB_PREFIX . "option`
                             SET `api_id` = '" . $this->db->escape($option_array['optionId']) . "'
                             WHERE `option_id` = '" . (int)$row['option_id'] . "';";
                     db_query_handler($this->db, $SQL, true);
                     continue;
                 }
 
-                $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "option` 
+                usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "option` 
                         SET `api_id` = '" . $this->db->escape($option_array['optionId']) . "',
                             `type` = '" . $this->db->escape($option_array['type']) . "',
                             `sort_order` = " . (int)$sort_order . ";";
@@ -78,7 +82,8 @@ class ModelExtensionApi4uOption extends Model
                 $last_inserted_id = (int)$this->db->getLastId();
                 if (!$last_inserted_id)
                 {
-                    $SQL = "SELECT O.`option_id`
+                    usleep(rand(30000, 100000));
+$SQL = "SELECT O.`option_id`
                             FROM " . DB_PREFIX . "option O
                             WHERE `O`.`api_id` = '{$option_array['optionId']}'";
                     $result = db_query_handler($this->db, $SQL, true);
@@ -89,7 +94,8 @@ class ModelExtensionApi4uOption extends Model
                 {
                     $foreign_name = isset($option_array['optionForeignName']) ? $option_array['optionForeignName'] : $option_array['optionName'];
                     $language_name = $key == 0 ? $foreign_name : $option_array['optionName'];
-                    $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "option_description`
+                    usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "option_description`
                             SET `option_id` = $last_inserted_id,
                                 `language_id` = " . (int)$id . ",
                                 `name` = '" . $this->db->escape($language_name) . "'
@@ -104,6 +110,7 @@ class ModelExtensionApi4uOption extends Model
         if (!$transaction_commit)
         {
             log_error('[Failed Transaction]', 'integrateOption');
+            $this->db->close();
             exit();
         }
     }
@@ -130,6 +137,7 @@ class ModelExtensionApi4uOption extends Model
         if (!$transaction)
         {
             log_error('[Failed Transaction]', 'integrateOptionValue');
+            $this->db->close();
             exit();
         }
 
@@ -149,7 +157,8 @@ class ModelExtensionApi4uOption extends Model
              * If option value is new, insert.
              */
             $option_id = null;
-            $SQL = "SELECT `option_id`
+            usleep(rand(30000, 100000));
+$SQL = "SELECT `option_id`
                     FROM `" . DB_PREFIX . "option`
                     WHERE `api_id` = '" . $this->db->escape($option_value_array['optionId']) . "'";
             $result = db_query_handler($this->db, $SQL, true);
@@ -158,7 +167,8 @@ class ModelExtensionApi4uOption extends Model
                 $option_id = (int)$result->row['option_id'];
             }
 
-            $SQL = "SELECT `OV`.`option_value_id`
+            usleep(rand(30000, 100000));
+$SQL = "SELECT `OV`.`option_value_id`
                     FROM `" . DB_PREFIX . "option_value` OV
                     INNER JOIN `" . DB_PREFIX . "option_value_description` OVD ON `OVD`.`option_value_id` = `OV`.`option_value_id`
                     WHERE `OVD`.`name` = '" . $this->db->escape($option_value_array['optionValueName']) . "' AND `OV`.`option_id` = '$option_id' AND `OV`.`api_id` = '" . $this->db->escape($option_value_array['optionValueId']) . "';";
@@ -166,27 +176,24 @@ class ModelExtensionApi4uOption extends Model
             if (!$result->num_rows)
             {
                 $filter_api_key = $option_value_array['filterId'] ?? '';
-                if ($row = check_existence($this->db, DB_PREFIX . 'option_value_description', 'name', $option_value_array['optionValueName'], 'option_value_id'))
-                {
-                    $SQL = "UPDATE `" . DB_PREFIX . "option_value`
-                            SET `api_id` = '" . $this->db->escape($option_value_array['optionValueId']) . "',
-                                `api_filter_id` = (SELECT `F`.`filter_id`
-                                               FROM `" . DB_PREFIX . "filter` F
-                                               WHERE `api_id` = '" . $this->db->escape($filter_api_key) . "')
-                            WHERE `option_value_id` = '" . (int)$row['option_value_id'] . "';";
-                    db_query_handler($this->db, $SQL, true);
-                    continue;
-                }
+                // if ($row = check_existence($this->db, DB_PREFIX . 'option_value_description', 'name', $option_value_array['optionValueName'], 'option_value_id'))
+                // {
+                usleep(rand(30000, 100000));
+$SQL = "UPDATE `" . DB_PREFIX . "option_value`
+                //             SET `api_id` = '" . $this->db->escape($option_value_array['optionValueId']) . "',
+                //                 `api_filter_id` = (SELECT `F`.`filter_id`
+                //                                FROM `" . DB_PREFIX . "filter` F
+                //                                WHERE `api_id` = '" . $this->db->escape($filter_api_key) . "')
+                //             WHERE `option_value_id` = '" . (int)$row['option_value_id'] . "';";
+                //     db_query_handler($this->db, $SQL, true);
+                //     continue;
+                // }
 
-                $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "option_value` 
+                usleep(rand(30000, 100000));
+$SQL = "INSERT INTO `" . DB_PREFIX . "option_value` 
                         SET `api_id` = '" . $this->db->escape($option_value_array['optionValueId']) . "',
-                            `option_id` = $option_id,
-                            `api_filter_id` = (SELECT `F`.`filter_id`
-                                               FROM `" . DB_PREFIX . "filter` F
-                                               WHERE `api_id` = '" . $this->db->escape($filter_api_key) . "'),
-                            `sort_order` = " . (int)$option_value_array['sortOrder'] . "
-                        ON DUPLICATE KEY UPDATE
-                            `api_filter_id` = VALUES(`api_filter_id`);";
+                            `option_id` = " . (int)$option_id . ",
+                            `sort_order` = " . (int)$option_value_array['sortOrder'] . ";";
                 db_query_handler($this->db, $SQL, true);
                 $last_inserted_id = (int)$this->db->getLastId();
 
@@ -194,7 +201,8 @@ class ModelExtensionApi4uOption extends Model
                 {
                     $foreign_name = isset($option_value_array['optionValueForeignName']) ? $option_value_array['optionValueForeignName'] : $option_value_array['optionValueName'];
                     $language_name = $key == 0 ? $foreign_name : $option_value_array['optionValueName'];
-                    $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "option_value_description`
+                    usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "option_value_description`
                             SET `option_value_id` = $last_inserted_id,
                                 `language_id` = " . (int)$id . ",
                                 `option_id` = $option_id,
@@ -210,6 +218,7 @@ class ModelExtensionApi4uOption extends Model
         if (!$transaction_commit)
         {
             log_error('[Failed Transaction]', 'integrateOptionValue');
+            $this->db->close();
             exit();
         }
     }

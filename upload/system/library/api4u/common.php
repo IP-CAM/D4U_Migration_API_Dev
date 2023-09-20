@@ -1,5 +1,5 @@
 <?php
-
+ini_set('memory_limit', '1024M');
 date_default_timezone_set('Europe/Athens');
 
 if (PHP_SAPI != 'cli')
@@ -28,7 +28,8 @@ function log_request_garbage_collector()
     global $db;
     $ids = array();
 
-    $SQL = "SELECT id
+    usleep(rand(30000, 100000));
+$SQL = "SELECT id
             FROM " . DB_PREFIX . "log_request
             ORDER BY id DESC LIMIT 1000;";
     $result = db_query_handler($db, $SQL);
@@ -48,8 +49,8 @@ function log_request_garbage_collector()
     if (!empty($ids))
     {        
 
-        usleep(rand(100000, 200000));
-        $SQL = "DELETE
+          usleep(rand(30000, 100000));
+$SQL = "DELETE
                 FROM " . DB_PREFIX . "log_request
                 WHERE id NOT IN(" . implode("',", $ids) . "'" . ");";
         $result = db_query_handler($db, $SQL);

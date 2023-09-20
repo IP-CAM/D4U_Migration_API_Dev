@@ -35,6 +35,7 @@ $db = db_connection();
 $registry->set('db', $db);
 
 //Error file
+usleep(rand(30000, 100000));
 $SQL = "SELECT `value`
         FROM `" . DB_PREFIX . "setting`
         WHERE `key` = 'config_error_filename';";
@@ -48,6 +49,7 @@ if ($result->num_rows)
 define('API4U_ERROR_FILE', $error_file);
 
 // Language
+usleep(rand(30000, 100000));
 $SQL = "SELECT `language_id`
         FROM `" . DB_PREFIX . "language`;";
 $result = db_query_handler($db, $SQL);
@@ -57,6 +59,7 @@ if ($result->num_rows)
 }
 
 // Customer group
+usleep(rand(30000, 100000));
 $SQL = "SELECT `customer_group_id`
         FROM `" . DB_PREFIX . "customer_group`;";
 $result = db_query_handler($db, $SQL);
@@ -80,22 +83,26 @@ $registry->set('config', $config);
 //$session->data['api_id'] = 1;
 //$session->start($session_id);
 //
-//$SQL = "INSERT INTO `" . DB_PREFIX . "session`(`session_id`, `data`, `expire`) VALUES
+//usleep(rand(30000, 100000));
+$SQL = "INSERT INTO `" . DB_PREFIX . "session`(`session_id`, `data`, `expire`) VALUES
 //            ('$session_id', '{\"api_id\":\"1\"}', DATE_ADD(NOW(), INTERVAL 2 MINUTE));";
 //db_query_handler($db, $SQL);
 //
-//$SQL = "INSERT INTO `" . DB_PREFIX . "api_session`(`api_id`, `session_id`, `ip`, `date_added`, `date_modified`)
+//usleep(rand(30000, 100000));
+$SQL = "INSERT INTO `" . DB_PREFIX . "api_session`(`api_id`, `session_id`, `ip`, `date_added`, `date_modified`)
 //        VALUES (1, '$session_id', '" . gethostbyname("www.navygreen-multi.demod4u.gr") . "', NOW(), NOW());";
 //db_query_handler($db, $SQL);
 //
-//$SQL = "SELECT `ip`
+//usleep(rand(30000, 100000));
+$SQL = "SELECT `ip`
 //        FROM `" . DB_PREFIX . "api_ip`
 //        WHERE `ip` = '" . gethostbyname("www.navygreen-multi.demod4u.gr") . "' AND `api_id` = 1;";
 //$result = db_query_handler($db, $SQL);
 //
 //if (!$result->num_rows)
 //{
-//    $SQL = "INSERT INTO `" . DB_PREFIX . "api_ip`(`api_id`, `ip`)
+//    usleep(rand(30000, 100000));
+$SQL = "INSERT INTO `" . DB_PREFIX . "api_ip`(`api_id`, `ip`)
 //            VALUES (1, '" . gethostbyname("www.navygreen-multi.demod4u.gr") . "');";
 //    db_query_handler($db, $SQL);
 //}

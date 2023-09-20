@@ -1,6 +1,8 @@
 <?php
 
 use Curl\Curl;
+error_reporting(E_ALL);
+ini_set('error_reporting', E_ALL);
 
 class APIExecution
 {
@@ -128,7 +130,7 @@ class APIExecution
             return $retry_status;
         });
 
-        if ($post) {
+        if ($post == true) {
             $this->curl->post($this->url, $data);
         } else {
             $this->curl->get($this->url, $data);

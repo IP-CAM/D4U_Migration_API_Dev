@@ -45,13 +45,15 @@ that our extension is using around, in functions and statements.
 
 > ERP Fetched Items Limitation (max 2000) <code>define('API_PACKAGE_SIZE', '');</code>
 
-> In case API needs token for login <code>define('NEEDS_LOGIN_TOKEN', '');</code>
+> In case API needs token (true) for login or not (false)  <code>define('NEEDS_LOGIN_TOKEN', false);</code>
 
 > In case API works with POST (true) or GET (false) <code>define('IS_POST_OR_GET', false);</code>
 
-> API URL and Port connection (i.e. `'http://ip:port'`) <code>define('API_URL', '');</code>
+> API URL and Port connection (i.e. `'http://ip:port'`) <code>define('ERP_API_URL', '');</code>
 
-> Enable/Disable JSON Decode for returned Products, if needed or broke something <code>define('JSON_DECODE_PRODUCT', true);</code>
+> Give element of what do you want to migrate - import (i.e array("products", "manufacturers")) <code>define('INTEGRATE_PROCESS', array("products"));</code>
+
+> Point the index that data are stored in array/json <code>define('PRODUCTS_JSON_DATA_ENDPOINT', "Items");</code>
 
 <br />
 
@@ -62,10 +64,9 @@ at `integrateProduct()` function, i.e. if we have just the .
 
 1. We have to find/analyze the values that client and ERP returns, on JSON/Array/List at the API we GET/POST through.
 2. Then we can see the data structure to define which name/field has values stored at, i.e. `"Data":[{values}]` (here is "Data") or i.e. `"Data":{"Items":[{values}]}` / `"Data":{"AlterCodes":[{values}]}` (here is "Items"/"AlterCodes") etc.
-3. Next we use the field/name that includes the values/data and replace it on `"entitycode" => "field/name",` inside `$data_array['get_products']` (i.e. `"entitycode" => "AlterCodes",`.
-4. At last we declare the pointed array path of data onto `PRODUCTS_FIELD_NAME_IN_JSON` (i.e. `define('PRODUCTS_FIELD_NAME_IN_JSON', '$response['Data']['AlterCodes']');`), so it can check the data and proceed to the integration if exists.
-5. In the end you have to map the variables (i.e. `$special_price`, `$price`, etc) with the value of the relative Product's Array/JSON values (i.e. `$price = $value['RETAILPRICE']`, `$price = $value['INITIALRTLPRICE']`)
-6. Most important Mapping variables to be filled with data, for a completed migration:
+3. At last we declare the pointed array path of data onto `$productsDetails` at 'integration.php' (i.e. `$productsDetails = $response['Data']['AlterCodes']');`), so it can check the data and proceed to the integration if exists.
+4. In the end you have to map the variables (i.e. `$special_price`, `$price`, etc) with the value of the relative Product's Array/JSON values (i.e. `$price = $value['RETAILPRICE']`, `$price = $value['INITIALRTLPRICE']`)
+5. Most important Mapping variables to be filled with data, for a completed migration:
 
   | Variable | Data Value Expect |
   | --- | --- |

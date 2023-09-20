@@ -30,6 +30,7 @@ class ModelExtensionApi4uRelatedOption extends Model
         if (!$transaction)
         {
             log_error('[Failed Transaction]', 'integrateRelatedOptionImage');
+            $this->db->close();
             exit();
         }
 
@@ -69,14 +70,16 @@ class ModelExtensionApi4uRelatedOption extends Model
                         `api_id` IS NULL";
             if ($row = check_existence($this->db, DB_PREFIX . 'poip_option_image', 'image', $this->db->escape($image), 'product_id', $condition))
             {
-                $SQL = "UPDATE `" . DB_PREFIX . "poip_option_image`
+                usleep(rand(30000, 100000));
+$SQL = "UPDATE `" . DB_PREFIX . "poip_option_image`
                         SET `api_id` = '" . $this->db->escape($api_id . $colour) . "'
                         WHERE `image` = '" . $this->db->escape($image) . "' $condition;";
                 db_query_handler($this->db, $SQL, true);
                 continue;
             }
 
-            $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "poip_option_image` 
+            usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "poip_option_image` 
                     SET `product_id` = (SELECT `product_id`
                                         FROM `" . DB_PREFIX . "product`
                                         WHERE `api_id` = '" . $this->db->escape($api_id) . "'),
@@ -107,6 +110,7 @@ class ModelExtensionApi4uRelatedOption extends Model
         if (!$transaction_commit)
         {
             log_error('[Failed Transaction]', 'integrateRelatedOptionImage');
+            $this->db->close();
             exit();
         }
     }
@@ -117,6 +121,7 @@ class ModelExtensionApi4uRelatedOption extends Model
         if (!$transaction)
         {
             log_error('[Failed Transaction]', 'integrateRelatedOptionImageFiles.');
+            $this->db->close();
             exit();
         }
 
@@ -136,7 +141,8 @@ class ModelExtensionApi4uRelatedOption extends Model
                     $model_and_colour = str_replace('$', '/', preg_split('/[$]DETAIL/i', $filename)[0]);
                     $sort = trim($output_array[0], '$DETAIL');
                     $exploded_path = explode('/image/', $path)[1];
-                    $SQL = "SELECT `product_id`, `model`, `api_id`
+                    usleep(rand(30000, 100000));
+$SQL = "SELECT `product_id`, `model`, `api_id`
                             FROM `" . DB_PREFIX . "product`
                             WHERE INSTR('" . $this->db->escape($model_and_colour) . "', `model`) AND `api_custom_field` = " . (int)$store . ";";
                     $result = db_query_handler($this->db, $SQL, true);
@@ -158,7 +164,8 @@ class ModelExtensionApi4uRelatedOption extends Model
                      * If related option image is new, insert.
                      */
                     $colour = str_replace($model . '/', '', $model_and_colour);
-                    $SQL = "SELECT `POV`.`product_option_value_id`
+                    usleep(rand(30000, 100000));
+$SQL = "SELECT `POV`.`product_option_value_id`
                             FROM `" . DB_PREFIX . "product_option_value` POV
                             INNER JOIN " . DB_PREFIX . "option_value_description OVD ON `OVD`.`option_value_id` = `POV`.`option_value_id`
                             WHERE `POV`.`product_id` = " . (int)$product_id . " AND REPLACE(`OVD`.`name`, \"/\", \" \") = REPLACE('" . $this->db->escape($colour) . "', \"/\", \" \")
@@ -190,14 +197,16 @@ class ModelExtensionApi4uRelatedOption extends Model
 
                     if ($row = check_existence($this->db, DB_PREFIX . 'poip_option_image', 'image', $this->db->escape($exploded_path), 'product_id', $condition))
                     {
-                        $SQL = "UPDATE `" . DB_PREFIX . "poip_option_image`
+                        usleep(rand(30000, 100000));
+$SQL = "UPDATE `" . DB_PREFIX . "poip_option_image`
                                 SET `api_id` = '" . $this->db->escape($exploded_path) . "'
                                 WHERE `image` = '" . $this->db->escape($exploded_path) . "' $condition;";
                         db_query_handler($this->db, $SQL, true);
                         continue;
                     }
 
-                    $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "poip_option_image` 
+                    usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "poip_option_image` 
                             SET `product_id` = '$product_id',
                                 `product_option_id` = (SELECT `PO`.`product_option_id` 
                                                        FROM `nvgrntbl_product_option` PO
@@ -251,19 +260,21 @@ class ModelExtensionApi4uRelatedOption extends Model
         if (!$transaction)
         {
             log_error('[Failed Transaction]', 'integrateRelatedOptionAndQuantity');
+            $this->db->close();
             exit();
         }
 
         $variant = "color+size";
         $last_inserted_id = 0;
-        usleep(rand(100000, 200000));
-        $SQL = "SELECT `relatedoptions_variant_id`
+          usleep(rand(30000, 100000));
+$SQL = "SELECT `relatedoptions_variant_id`
                 FROM `" . DB_PREFIX . "relatedoptions_variant` 
                 WHERE `relatedoptions_variant_name` = '" . $this->db->escape($variant) . "';";
         $result = db_query_handler($this->db, $SQL, true);
         if (!$result->num_rows)
         {
-            $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "relatedoptions_variant`
+            usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "relatedoptions_variant`
                     SET `relatedoptions_variant_name` = '" . $this->db->escape($variant) . "',
                         `sort_order` = 1;";
             db_query_handler($this->db, $SQL, true);
@@ -284,7 +295,8 @@ class ModelExtensionApi4uRelatedOption extends Model
             $sku = $value['itemAlterCode'];
             foreach ($value['options'] as $variant_options)
             {
-                $SQL = "SELECT `relatedoptions_variant_id`
+                usleep(rand(30000, 100000));
+$SQL = "SELECT `relatedoptions_variant_id`
                         FROM `" . DB_PREFIX . "relatedoptions_variant_option` 
                         WHERE `relatedoptions_variant_id` = '" . $this->db->escape($last_inserted_id) . "'
                             AND `option_id` = (SELECT option_id
@@ -293,7 +305,8 @@ class ModelExtensionApi4uRelatedOption extends Model
                 $result = db_query_handler($this->db, $SQL, true);
                 if (!$result->num_rows)
                 {
-                    $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "relatedoptions_variant_option`
+                    usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "relatedoptions_variant_option`
                             SET `relatedoptions_variant_id` = '" . $this->db->escape($last_inserted_id) . "',
                                 `option_id` = (SELECT option_id
                                                       FROM `" . DB_PREFIX . "option`
@@ -301,7 +314,8 @@ class ModelExtensionApi4uRelatedOption extends Model
                     db_query_handler($this->db, $SQL, true);
                 }
 
-                $SQL = "SELECT `product_ID`
+                usleep(rand(30000, 100000));
+$SQL = "SELECT `product_ID`
                         FROM `" . DB_PREFIX . "product`
                         WHERE  `api_id` = '" . $this->db->escape($product_api_id) . "';";
                 $result = db_query_handler($this->db, $SQL, true);
@@ -312,7 +326,8 @@ class ModelExtensionApi4uRelatedOption extends Model
 
                 $last_inserted_relatedoptions_variant_product_id = 0;
                 $last_inserted_relatedoptions_id = 0;
-                $SQL = "SELECT `relatedoptions_variant_product_id`
+                usleep(rand(30000, 100000));
+$SQL = "SELECT `relatedoptions_variant_product_id`
                         FROM `" . DB_PREFIX . "relatedoptions_variant_product`
                         WHERE `relatedoptions_variant_id` = '" . $this->db->escape($last_inserted_id) . "'
                             AND `product_id` = (SELECT `product_id`
@@ -321,7 +336,8 @@ class ModelExtensionApi4uRelatedOption extends Model
                 $result = db_query_handler($this->db, $SQL, true);
                 if (!$result->num_rows)
                 {
-                    $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "relatedoptions_variant_product`
+                    usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "relatedoptions_variant_product`
                             SET `relatedoptions_variant_id` = '" . $this->db->escape($last_inserted_id) . "',
                                 `product_id` = (SELECT `product_id`
                                                 FROM `" . DB_PREFIX . "product`
@@ -337,13 +353,15 @@ class ModelExtensionApi4uRelatedOption extends Model
                     $last_inserted_relatedoptions_variant_product_id = (int)$result->row['relatedoptions_variant_product_id'];
                 }
 
-                $SQL = "SELECT `relatedoptions_id`
+                usleep(rand(30000, 100000));
+$SQL = "SELECT `relatedoptions_id`
                         FROM `" . DB_PREFIX . "relatedoptions`
                         WHERE `sku` = '" . $this->db->escape($sku) . "' AND `relatedoptions_variant_product_id` = '$last_inserted_relatedoptions_variant_product_id';";
                 $result = db_query_handler($this->db, $SQL, true);
                 if (!$result->num_rows)
                 {
-                    $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "relatedoptions`
+                    usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "relatedoptions`
                             SET `relatedoptions_variant_product_id` = '$last_inserted_relatedoptions_variant_product_id',
                                 `product_id` = (SELECT `product_id`
                                                 FROM `" . DB_PREFIX . "product`
@@ -369,7 +387,8 @@ class ModelExtensionApi4uRelatedOption extends Model
                 else
                 {
                     $last_inserted_relatedoptions_id = (int)$result->row['relatedoptions_id'];
-                    $SQL = "UPDATE `" . DB_PREFIX . "relatedoptions`
+                    usleep(rand(30000, 100000));
+$SQL = "UPDATE `" . DB_PREFIX . "relatedoptions`
                             SET `quantity` = '$quantity',
                                 `in_stock_status_id` = '$stock_status_id',
                                 `stock_status_id` = '$status'
@@ -377,7 +396,8 @@ class ModelExtensionApi4uRelatedOption extends Model
                     db_query_handler($this->db, $SQL, true);
                 }
 
-                $SQL = "SELECT `relatedoptions_id`
+                usleep(rand(30000, 100000));
+$SQL = "SELECT `relatedoptions_id`
                         FROM `" . DB_PREFIX . "relatedoptions_option` 
                         WHERE `relatedoptions_id` = '$last_inserted_relatedoptions_id'
                             AND `product_id` = (SELECT `product_id`
@@ -392,7 +412,8 @@ class ModelExtensionApi4uRelatedOption extends Model
                 $result = db_query_handler($this->db, $SQL, true);
                 if (!$result->num_rows)
                 {
-                    $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "relatedoptions_option`
+                    usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "relatedoptions_option`
                             SET `relatedoptions_id` = '$last_inserted_relatedoptions_id',
                                 `product_id` = (SELECT `product_id`
                                                 FROM `" . DB_PREFIX . "product`
@@ -412,6 +433,7 @@ class ModelExtensionApi4uRelatedOption extends Model
         if (!$transaction_commit)
         {
             log_error('[Failed Transaction]', 'integrateRelatedOptionAndQuantity');
+            $this->db->close();
             exit();
         }
     }

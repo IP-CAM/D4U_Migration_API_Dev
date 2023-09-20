@@ -1,5 +1,5 @@
 <?php
-
+ini_set('memory_limit', '1024M');
 function log_error($header, $error_message): void
 {
     date_default_timezone_set('Europe/Athens');
@@ -47,6 +47,7 @@ function db_query_handler($db, $SQL, $rollback = false, $exit_on_error = true)
         echo 'Cron process finished errors.';
         if ($exit_on_error)
         {
+            $this->db->close();
             exit();
         }
     }
@@ -73,10 +74,10 @@ function insertUpdateValues($db, $SQL, $SQL_INSERT_VALUES, $table, $on_duplicate
     else
     {
         $on_duplicate_value = $on_duplicate_value != '' ? 'ON DUPLICATE KEY UPDATE ' . $on_duplicate_value : '';
-        usleep(rand(100000, 200000));
+          usleep(rand(30000, 100000));
         $SQL_INSERT_VALUES = rtrim($SQL_INSERT_VALUES, ',');        
 
-        usleep(rand(100000, 200000));
+          usleep(rand(30000, 100000));
         $SQL .= $SQL_INSERT_VALUES . $on_duplicate_value;
         db_query_handler($db, $SQL, true);
     }
@@ -84,7 +85,8 @@ function insertUpdateValues($db, $SQL, $SQL_INSERT_VALUES, $table, $on_duplicate
 
 function main_image_selection($db, $model, $excluded_image): string
 {
-    $SQL = "SELECT `image`
+    usleep(rand(30000, 100000));
+$SQL = "SELECT `image`
             FROM `" . DB_PREFIX . "poip_option_image`
             WHERE `product_id` = (SELECT `product_id`
                                   FROM `" . DB_PREFIX . "product`
@@ -108,7 +110,8 @@ function main_image_selection($db, $model, $excluded_image): string
 
 function check_existence($db, $table, $column, $value, $column_value): array
 {
-    $SQL = "SELECT `$column_value`
+    usleep(rand(30000, 100000));
+$SQL = "SELECT `$column_value`
             FROM `$table`
             WHERE `$column` = '$value';";
     $result = db_query_handler($db, $SQL, true);

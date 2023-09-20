@@ -19,7 +19,8 @@ class ControllerApiApi4u extends Controller {
 
 			//Error file
 			$error_file = 'error.log';
-			$SQL = "SELECT `value`
+			usleep(rand(30000, 100000));
+$SQL = "SELECT `value`
 				FROM `" . DB_PREFIX . "setting`
 				WHERE `key` = 'config_error_filename';";
 			$result = db_query_handler($this->db, $SQL);
@@ -30,7 +31,8 @@ class ControllerApiApi4u extends Controller {
 			define('API4U_ERROR_FILE', $error_file);
 
             // Language
-            $SQL = "SELECT `language_id`
+            usleep(rand(30000, 100000));
+$SQL = "SELECT `language_id`
                 FROM `" . DB_PREFIX . "language`;";
             $result = db_query_handler($this->db, $SQL);
             if ($result->num_rows)
@@ -39,7 +41,8 @@ class ControllerApiApi4u extends Controller {
             }
 
             // Customer group
-            $SQL = "SELECT `customer_group_id`
+            usleep(rand(30000, 100000));
+$SQL = "SELECT `customer_group_id`
                 FROM `" . DB_PREFIX . "customer_group`;";
             $result = db_query_handler($this->db, $SQL);
             if ($result->num_rows)

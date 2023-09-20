@@ -29,7 +29,8 @@ class ControllerExtensionModuleApi4uPostMissedOrder extends Controller
         {
             $error_file = 'error.log';
             //Error file
-            $SQL = "SELECT `value`
+            usleep(rand(30000, 100000));
+$SQL = "SELECT `value`
                     FROM `" . DB_PREFIX . "setting`
                     WHERE `key` = 'config_error_filename';";
             $result = db_query_handler($this->db, $SQL);
@@ -40,7 +41,8 @@ class ControllerExtensionModuleApi4uPostMissedOrder extends Controller
             }
             define('API4U_ERROR_FILE', $error_file);
 
-            $SQL = "SELECT `store_id`
+            usleep(rand(30000, 100000));
+$SQL = "SELECT `store_id`
                     FROM `" . DB_PREFIX . "order`
                     WHERE `order_id` = " . (int)$order_id . ";";
             $result = db_query_handler($this->db, $SQL);
@@ -122,12 +124,14 @@ class ControllerExtensionModuleApi4uPostMissedOrder extends Controller
                     }
                 }
 
-                $SQL = "UPDATE `" . DB_PREFIX . "session`
+                usleep(rand(30000, 100000));
+$SQL = "UPDATE `" . DB_PREFIX . "session`
                         SET `data` = JSON_SET(`data`, '$.api_id', \"1\")
                         WHERE `session_id` = '" . $this->session->getId() . "';";
                 db_query_handler($this->db, $SQL);
 
-                $SQL = "INSERT INTO `" . DB_PREFIX . "api_session`(`api_id`, `session_id`, `ip`, `date_added`, `date_modified`)
+                usleep(rand(30000, 100000));
+$SQL = "INSERT INTO `" . DB_PREFIX . "api_session`(`api_id`, `session_id`, `ip`, `date_added`, `date_modified`)
                         VALUES (1, '" . $this->session->getId() . "', '{$_SERVER['REMOTE_ADDR']}', NOW(), NOW());";
                 db_query_handler($this->db, $SQL);
 
@@ -165,6 +169,7 @@ class ControllerExtensionModuleApi4uPostMissedOrder extends Controller
                 "success" => false,
                 "message" => "Process failed!"
             ));
+            $this->db->close();
             exit();
         }
     }

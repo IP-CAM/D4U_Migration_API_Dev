@@ -28,7 +28,8 @@ class ControllerApi4uPostOrder extends Controller
         {
             $error_file = 'error.log';
             //Error file
-            $SQL = "SELECT `value`
+            usleep(rand(30000, 100000));
+$SQL = "SELECT `value`
                     FROM `" . DB_PREFIX . "setting`
                     WHERE `key` = 'config_error_filename';";
             $result = db_query_handler($this->db, $SQL);
@@ -45,7 +46,8 @@ class ControllerApi4uPostOrder extends Controller
             }
             $_SESSION["post_order"] = true;
 
-            $SQL = "UPDATE `" . DB_PREFIX . "session`
+            usleep(rand(30000, 100000));
+$SQL = "UPDATE `" . DB_PREFIX . "session`
                     SET `data` = REPLACE(`data`, 'order_id', '')
                     WHERE data LIKE '%\"order_id\":" . $this->session->data['order_id'] . "%';";
             db_query_handler($this->db, $SQL);

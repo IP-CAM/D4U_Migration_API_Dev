@@ -6,7 +6,8 @@ class ModelExtensionApi4uLogRequest extends Model
     {
         if (!empty($data))
         {
-            $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "log_request` SET 
+            usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "log_request` SET 
                     `url` = '" . $this->db->escape($data['url']) . "',
                     `parameters` = '" . $this->db->escape($data['parameters']) . "',
                     `code`= '" . $this->db->escape($data['code']) . "',

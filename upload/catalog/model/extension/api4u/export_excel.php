@@ -5,8 +5,8 @@ class ModelExtensionApi4uExportExcel extends Model
     public function index($store = 0): object
     {        
 
-        usleep(rand(100000, 200000));
-        $SQL = "SELECT `P`.`model`, `PD`.`name`, `P`.`price`, `PS`.`price` AS special_price, `P`.`date_added`, `OVD`.`name` AS filter_name, IF(`P`.`status`, 'ΕΝΕΡΓΟ', 'ΑΝΕΝΕΡΓΟ') AS status, `P`.`image`, 
+          usleep(rand(30000, 100000));
+$SQL = "SELECT `P`.`model`, `PD`.`name`, `P`.`price`, `PS`.`price` AS special_price, `P`.`date_added`, `OVD`.`name` AS filter_name, IF(`P`.`status`, 'ΕΝΕΡΓΟ', 'ΑΝΕΝΕΡΓΟ') AS status, `P`.`image`, 
                         substring_index(GROUP_CONCAT(IF(`PI`.`image` LIKE CONCAT('%',  REPLACE(REPLACE(`OVD`.`name`, \"/\", \"$\"), \" \", \"$\") ,'%'), `PI`.`image`, NULL)), ',', 5) AS images,
                        `POV`.`quantity`, `FD`.`name` AS season
                 FROM `" . DB_PREFIX . "product` P

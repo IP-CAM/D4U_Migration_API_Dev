@@ -1,5 +1,8 @@
 <?php
 
+error_reporting(E_ALL);
+ini_set('error_reporting', E_ALL);
+
 class ModelExtensionModuleApi4uMigrations extends Model
 {
     public function up()
@@ -37,8 +40,8 @@ class ModelExtensionModuleApi4uMigrations extends Model
     //Up
     public function createLogRequestUp()
     {
-      usleep(rand(100000, 200000));
-        $SQL = "CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "log_request` (
+        usleep(rand(30000, 100000));
+$SQL = "CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "log_request` (
                     `id` INT(11) NOT NULL AUTO_INCREMENT,
                     `url` VARCHAR(255) NOT NULL COLLATE 'utf8mb4_unicode_520_ci',
                     `parameters` TEXT NOT NULL COLLATE 'utf8mb4_unicode_520_ci',
@@ -80,11 +83,13 @@ class ModelExtensionModuleApi4uMigrations extends Model
                 //echo 'Trying<br/>';
 
                 if (stripos($datas[2], 'INDEX')) {
-                    $SQL = (string) $datas[2];
+                    usleep(rand(30000, 100000));
+$SQL = (string) $datas[2];
                     $SQL .= (string) " ON ". DB_PREFIX . $datas[0];
                     $SQL .= ";";
                 } else if($columnExists == 0 || ($columnExists == 1 && stripos($datas[2], 'DROP'))) { // If the column Doesn't exists or it's a Drop query, only then, run it
-                    $SQL = "ALTER TABLE `" . DB_PREFIX . $datas[0] ."`";
+                    usleep(rand(30000, 100000));
+$SQL = "ALTER TABLE `" . DB_PREFIX . $datas[0] ."`";
                     $SQL .= (string) $datas[2];
                     $SQL .= ";";
                     
@@ -101,11 +106,13 @@ class ModelExtensionModuleApi4uMigrations extends Model
             //echo 'Trying<br/>';
 
             if (stripos($datas[2], 'INDEX')) {
-                $SQL = (string) $datas[2];
+                usleep(rand(30000, 100000));
+$SQL = (string) $datas[2];
                 $SQL .= (string) " ON ". DB_PREFIX . $datas[0];
                 $SQL .= ";";
             } else if($columnExists == 0 || ($columnExists == 1 && stripos($datas[2], 'DROP'))) { // If the column Doesn't exists or it's a Drop query, only then, run it
-                $SQL = "ALTER TABLE `" . DB_PREFIX . $datas[0] ."`";
+                usleep(rand(30000, 100000));
+$SQL = "ALTER TABLE `" . DB_PREFIX . $datas[0] ."`";
                 $SQL .= $datas[2];
                 $SQL .= ";";
                 
@@ -245,8 +252,8 @@ class ModelExtensionModuleApi4uMigrations extends Model
     //Down
     public function createLogRequestDown()
     {
-        usleep(rand(100000, 200000));
-        $SQL = "DROP TABLE IF EXISTS`" . DB_PREFIX . "log_request`;";
+          usleep(rand(30000, 100000));
+$SQL = "DROP TABLE IF EXISTS`" . DB_PREFIX . "log_request`;";
         db_query_handler($this->db, $SQL, 0, 0);
     }
 

@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('error_reporting', E_ALL);
 
 class ModelExtensionApi4uProduct extends Model
 {
@@ -25,13 +27,14 @@ class ModelExtensionApi4uProduct extends Model
         if (!$transaction)
         {
             log_error('[Failed Transaction]', 'integrateProduct');
+            $this->db->close();
             exit();
         }
 
-        if(JSON_DECODE_PRODUCT == true) if(!is_array($data)) $value = json_decode($data, TRUE);
+        if(!is_array($data)) $data = json_decode($data, TRUE);
         foreach ($data as $value)
         {
-            if(JSON_DECODE_PRODUCT == true) if(!is_array($value)) $value = json_decode($value, TRUE);
+            if(!is_array($value)) $value = json_decode($value, TRUE);
             $last_inserted_id = 0;
             $model = $value['ITEMCODE'] ?? null;
             $api_id = $value['ITEMID'] ?? null;
@@ -98,9 +101,9 @@ class ModelExtensionApi4uProduct extends Model
             $date_modified = $value['dateModified'] ?? 'NOW()';
             if ($row = check_existence($this->db, DB_PREFIX . 'product', 'api_id', $api_id, 'api_id'))
             {
-                usleep(rand(100000, 250000));
                 $order = $store ? 'DESC' : 'ASC';
-                $SQL = "UPDATE `" . DB_PREFIX . "product`
+                usleep(rand(30000, 100000));
+$SQL = "UPDATE `" . DB_PREFIX . "product`
                         SET `sku` = '" . $this->db->escape($sku) . "',
                             `upc` = '" . $this->db->escape($upc) . "',
                             `ean` = '" . $this->db->escape($ean) . "',
@@ -118,7 +121,7 @@ class ModelExtensionApi4uProduct extends Model
                             `price` = '" . (float)$price . "',
                             `points` = '" . (int)$points . "', 
                             `tax_class_id` = '" . (int)$tax_class_id . "',
-                            `date_available` = 'CURDATE()',
+                            `date_available` = '".date('Y-m-d')."',
                             `weight` = " . (float)$weight . ",
                             `weight_class_id` = '" . (int)$weight_class_id . "',
                             `length` = '" . (float)$length . "',
@@ -132,15 +135,14 @@ class ModelExtensionApi4uProduct extends Model
                             `viewed` = '" . (int)$viewed . "',
                             `date_modified` = " . $date_modified . "
                         WHERE `api_id` = '" . (string) $api_id . "'
-                        ORDER BY `product_id` $order
                         LIMIT 1;";
                 db_query_handler($this->db, $SQL, true);
             }
             else
             {
-                usleep(rand(100000, 250000));
                 //Insert - Update product table
-                $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product`
+                usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product`
                         SET `model` = '" . $this->db->escape($model) . "',
                             `sku` = '" . $this->db->escape($sku) . "',
                             `upc` = '" . $this->db->escape($upc) . "',
@@ -159,7 +161,7 @@ class ModelExtensionApi4uProduct extends Model
                             `price` = '" . (float)$price . "',
                             `points` = '" . (int)$points . "', 
                             `tax_class_id` = '" . (int)$tax_class_id . "',
-                            `date_available` = 'CURDATE()',
+                            `date_available` = '".date('Y-m-d')."',
                             `weight` = " . (float)$weight . ",
                             `weight_class_id` = '" . (int)$weight_class_id . "',
                             `length` = '" . (float)$length . "',
@@ -179,8 +181,8 @@ class ModelExtensionApi4uProduct extends Model
 
             if (!$last_inserted_id)
             {
-                usleep(rand(100000, 250000));
-                $SQL = "SELECT `product_id`
+                usleep(rand(30000, 100000));
+$SQL = "SELECT `product_id`
                         FROM `" . DB_PREFIX . "product`
                         WHERE `api_id` = '" . $this->db->escape($api_id) . "'";
                 $result = db_query_handler($this->db, $SQL, true);
@@ -196,10 +198,10 @@ class ModelExtensionApi4uProduct extends Model
             //This is compatible with two languages. It needs other approach to play correctly.
             foreach ($this->language_ids as $key => $id)
             {
-                usleep(rand(100000, 250000));
                 $language_name = $key == 0 ? $foreign_name : $name;
                 $language_description = $key == 0 ? $foreign_description : $description;
-                $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_description`
+                usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_description`
                         SET `product_id` = '$last_inserted_id',
                             `language_id` = '$id',
                             `name` = '" . $this->db->escape($language_name) . "',
@@ -213,18 +215,18 @@ class ModelExtensionApi4uProduct extends Model
                 db_query_handler($this->db, $SQL, true);
             }
 
-            usleep(rand(100000, 250000));
-            $SQL = "SELECT `product_special_id`
+            usleep(rand(30000, 100000));
+$SQL = "SELECT `product_special_id`
                     FROM `" . DB_PREFIX . "product_special`
                     WHERE `product_id` = '" . $last_inserted_id . "'
                     LIMIT 1;";
             $result = db_query_handler($this->db, $SQL, true);
             if ($result->num_rows)
             {
-                usleep(rand(100000, 250000));
                 $date_end = isset($special_price) && $special_price > 0 ? '0000-00-00' : 'NOW()';
                 //Update product_special table
-                $SQL = "UPDATE `" . DB_PREFIX . "product_special`
+                usleep(rand(30000, 100000));
+$SQL = "UPDATE `" . DB_PREFIX . "product_special`
                         SET `price` = '$special_price',
                             `date_end` = $date_end
                         WHERE `product_special_id` = " . (int)$last_inserted_id . ";";
@@ -237,8 +239,8 @@ class ModelExtensionApi4uProduct extends Model
                     if (isset($special_price))
                     {
                         //Insert product_special table
-                        usleep(rand(100000, 250000));
-                        $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_special`
+                        usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_special`
                                 SET `product_id` = '$last_inserted_id',
                                     `priority` = 1,
                                     `price` = '$special_price',
@@ -251,23 +253,23 @@ class ModelExtensionApi4uProduct extends Model
             }
 
             //Insert - Update product_to_store table
-            usleep(rand(100000, 250000));
-            $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_to_store`
+            usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_to_store`
                     SET `product_id` = '$last_inserted_id',
                         `store_id` = " . (int)$store . ";";
             db_query_handler($this->db, $SQL, true);
 
             //Insert - Update product_to_layout table
-            usleep(rand(100000, 250000));
-            $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_to_layout`
+            usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_to_layout`
                     SET `product_id` = '$last_inserted_id',
                         `store_id` =  " . (int)$store . ",
                         `layout_id` = 0;";
             db_query_handler($this->db, $SQL, true);
 
             //Insert product_to_category table
-            usleep(rand(100000, 250000));
-            $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_to_category`
+            usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_to_category`
                     SET `product_id` = '$last_inserted_id',
                         `category_id` = (SELECT category_id
                                          FROM `" . DB_PREFIX . "category`
@@ -282,8 +284,8 @@ class ModelExtensionApi4uProduct extends Model
                     foreach ($this->language_ids as $key => $id)
                     {
                         $language_name = $key == 0 ? $attr['attributeForeignText'] : $attr['attributeText'];
-                        usleep(rand(100000, 250000));
-                        $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_attribute`
+                        usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_attribute`
                                 SET `product_id` = '$last_inserted_id',
                                     `attribute_id` = (SELECT attribute_id
                                                       FROM `" . DB_PREFIX . "attribute`
@@ -301,8 +303,8 @@ class ModelExtensionApi4uProduct extends Model
             //Insert - Insert product_filter table
             foreach ($filters as $filter)
             {
-                usleep(rand(100000, 250000));
-                $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_filter`
+                usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_filter`
                         SET `product_id` = '$last_inserted_id',
                             `filter_id` = (SELECT filter_id
                                            FROM `" . DB_PREFIX . "filter`
@@ -323,8 +325,8 @@ class ModelExtensionApi4uProduct extends Model
                         continue;
                     }
                     
-                    usleep(rand(100000, 250000));
-                    $SQL = "SELECT `product_option_id`
+                    usleep(rand(30000, 100000));
+$SQL = "SELECT `product_option_id`
                             FROM `" . DB_PREFIX . "product_option`
                             WHERE `product_id` = '$last_inserted_id' 
                                 AND `option_id` = (
@@ -334,8 +336,8 @@ class ModelExtensionApi4uProduct extends Model
                     $result = db_query_handler($this->db, $SQL, true);
                     if (!$result->num_rows)
                     {
-                        usleep(rand(100000, 250000));
-                        $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_option`
+                        usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_option`
                                 SET `product_id` = '$last_inserted_id',
                                     `option_id` = (
                                         SELECT option_id
@@ -349,8 +351,8 @@ class ModelExtensionApi4uProduct extends Model
 
                     $last_inserted_product_option_id = !$last_inserted_product_option_id ? $result->row['product_option_id'] : $last_inserted_product_option_id;
                     $option_value_api_key = $option_val['optionValueId'];
-                    usleep(rand(100000, 250000));
-                    $SQL = "SELECT `product_option_value_id`, `api_filter_id`
+                    usleep(rand(30000, 100000));
+$SQL = "SELECT `product_option_value_id`, `api_filter_id`
                             FROM `" . DB_PREFIX . "product_option_value`
                             WHERE `product_option_id` = '" . (int)$last_inserted_product_option_id . "' AND `product_id` = '$last_inserted_id' 
                                 AND `option_id` = (
@@ -363,8 +365,8 @@ class ModelExtensionApi4uProduct extends Model
                     $result = db_query_handler($this->db, $SQL, true);
                     if ($result->num_rows)
                     {
-                        usleep(rand(100000, 250000));
-                        $SQL = "UPDATE `" . DB_PREFIX . "product_option_value`
+                        usleep(rand(30000, 100000));
+$SQL = "UPDATE `" . DB_PREFIX . "product_option_value`
                                 SET `api_filter_id` = (SELECT api_filter_id
                                                        FROM `" . DB_PREFIX . "option_value`
                                                        WHERE `api_id` = '" . $this->db->escape($option_value_api_key) . "'
@@ -376,8 +378,8 @@ class ModelExtensionApi4uProduct extends Model
                     }
                     else
                     {
-                        usleep(rand(100000, 250000));
-                        $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_option_value`
+                        usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_option_value`
                                 SET `product_option_id` = '$last_inserted_product_option_id',
                                     `product_id` = '$last_inserted_id',
                                     `option_id` = (SELECT option_id
@@ -408,6 +410,7 @@ class ModelExtensionApi4uProduct extends Model
         if (!$transaction_commit)
         {
             log_error('[Failed Transaction]', 'Update products operation failed.');
+            $this->db->close();
             exit();
         }
     }
@@ -418,6 +421,7 @@ class ModelExtensionApi4uProduct extends Model
         if (!$transaction)
         {
             log_error('[Failed Transaction]', 'integrateProductImage');
+            $this->db->close();
             exit();
         }
 
@@ -439,8 +443,8 @@ class ModelExtensionApi4uProduct extends Model
                     $model_and_colour = str_replace('$', '/', preg_split('/[$]DETAIL/i', $filename)[0]);
                     $sort = trim($output_array[0], '$DETAIL');
                     $exploded_path = explode('/image/', $path)[1];
-                    usleep(rand(100000, 250000));
-                    $SQL = "SELECT `product_id`
+                    usleep(rand(30000, 100000));
+$SQL = "SELECT `product_id`
                             FROM `" . DB_PREFIX . "product`
                             WHERE INSTR('" . $this->db->escape($model_and_colour) . "', `model`) AND `api_custom_field` = " . (int)$store . "
                             LIMIT 1;";
@@ -455,16 +459,16 @@ class ModelExtensionApi4uProduct extends Model
                                  `api_id` IS NULL";
                     if ($row = check_existence($this->db, DB_PREFIX . 'product_image', 'image', $this->db->escape($exploded_path), 'product_image_id', $condition))
                     {
-                        usleep(rand(100000, 250000));
-                        $SQL = "UPDATE `" . DB_PREFIX . "product_image`
+                        usleep(rand(30000, 100000));
+$SQL = "UPDATE `" . DB_PREFIX . "product_image`
                                 SET `api_id` = '" . $this->db->escape($exploded_path) . "'
                                 WHERE `image` = '" . $this->db->escape($exploded_path) . "' $condition;";
                         db_query_handler($this->db, $SQL, true);
                         continue;
                     }
 
-                    usleep(rand(100000, 250000));
-                    $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_image` 
+                    usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_image` 
                             SET `product_id` = '$product_id',
                                 `image` = '" . $this->db->escape($exploded_path) . "',
                                 `api_id` = '" . $this->db->escape($exploded_path) . "',
@@ -494,10 +498,11 @@ class ModelExtensionApi4uProduct extends Model
         if (!$transaction)
         {
             log_error('[Failed Transaction]', 'integrateProductDescription');
+            $this->db->close();
             exit();
         }
-        usleep(rand(100000, 200000));
-        $SQL = null;
+          usleep(rand(30000, 100000));
+$SQL = null;
         foreach ($data as $value)
         {
             $api_id = $value['itemID'] >> null;
@@ -516,8 +521,8 @@ class ModelExtensionApi4uProduct extends Model
             {
 
                 $language_description = $key == 0 ? $foreign_description : $description;
-                usleep(rand(100000, 250000));
-                $SQL = "UPDATE `" . DB_PREFIX . "product_description`
+                usleep(rand(30000, 100000));
+$SQL = "UPDATE `" . DB_PREFIX . "product_description`
                         SET `description` = '" . $this->db->escape($language_description) . "'
                         WHERE `product_id` = (SELECT `product_id`
                                               FROM `" . DB_PREFIX . "product`
@@ -530,6 +535,7 @@ class ModelExtensionApi4uProduct extends Model
         if (!$transaction_commit)
         {
             log_error('[Failed Transaction]', 'integrateProductDescription');
+            $this->db->close();
             exit();
         }
     }
@@ -560,10 +566,11 @@ class ModelExtensionApi4uProduct extends Model
         if (!$transaction)
         {
             log_error('[Failed Transaction]', 'integrateProductsQuantityAndOptions');
+            $this->db->close();
             exit();
         }
-        usleep(rand(100000, 200000));
-        $SQL = null;
+          usleep(rand(30000, 100000));
+$SQL = null;
         foreach ($data as $product_api_id => $value)
         {
             if (!isset($product_api_id))
@@ -576,8 +583,8 @@ class ModelExtensionApi4uProduct extends Model
             $status = $quantity > 0 ? 1 : 0;
             if ($status)
             {
-                usleep(rand(100000, 250000));
-                $SQL = "SELECT `image`
+                usleep(rand(30000, 100000));
+$SQL = "SELECT `image`
                         FROM `" . DB_PREFIX . "product`
                         WHERE  `api_id` = '" . $this->db->escape($product_api_id) . "';";
                 $result = db_query_handler($this->db, $SQL, true);
@@ -592,7 +599,8 @@ class ModelExtensionApi4uProduct extends Model
              * Table `product`
              * Update product table quantity.
              */
-            $SQL = "UPDATE `" . DB_PREFIX . "product`
+            usleep(rand(30000, 100000));
+$SQL = "UPDATE `" . DB_PREFIX . "product`
                     SET `quantity` = " . (int)$quantity . ",
                         `stock_status_id` = " . (int)$stock_status_id . ",
                         `status` = " . (int)$status . "
@@ -607,8 +615,8 @@ class ModelExtensionApi4uProduct extends Model
                      * Table `product_option_value`
                      * Update product_option_value table quantity.
                      */
-                    usleep(rand(100000, 250000));
-                    $SQL = "UPDATE `" . DB_PREFIX . "product_option_value`
+                    usleep(rand(30000, 100000));
+$SQL = "UPDATE `" . DB_PREFIX . "product_option_value`
                             SET `quantity` = " . (int)$quantity . "
                             WHERE `product_id` = (SELECT `product_id`
                                                 FROM `" . DB_PREFIX . "product`
@@ -628,6 +636,7 @@ class ModelExtensionApi4uProduct extends Model
         if (!$transaction_commit)
         {
             log_error('[Failed Transaction]', 'integrateProductsQuantityAndOptions');
+            $this->db->close();
             exit();
         }
     }
@@ -638,17 +647,19 @@ class ModelExtensionApi4uProduct extends Model
         if (!$transaction)
         {
             log_error('[Failed Transaction]', 'productsNewArrival');
+            $this->db->close();
             exit();
         }
-        usleep(rand(100000, 200000));
-        $SQL = "SELECT `product_id`
+          usleep(rand(30000, 100000));
+$SQL = "SELECT `product_id`
                 FROM `" . DB_PREFIX . "product`
                 WHERE `api_custom_field` = " . (int)$store . " AND `date_added` > DATE_SUB(NOW(), INTERVAL 30 DAY)";
         $result = db_query_handler($this->db, $SQL, true);
         foreach ($result->rows as $row)
         {
             $product_id = $row['product_id'];
-            $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_to_category`
+            usleep(rand(30000, 100000));
+$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_to_category`
                     SET `product_id` = " . (int)$product_id . ",
                         `category_id` = (SELECT category_id
                                          FROM `" . DB_PREFIX . "category_description`
@@ -656,16 +667,16 @@ class ModelExtensionApi4uProduct extends Model
                                          LIMIT 1);";
             db_query_handler($this->db, $SQL, true);
         }
-        usleep(rand(100000, 200000));
-        $SQL = "SELECT `product_id`
+          usleep(rand(30000, 100000));
+$SQL = "SELECT `product_id`
                 FROM `" . DB_PREFIX . "product`
                 WHERE `api_custom_field` = " . (int)$store . " AND `date_added` < DATE_SUB(NOW(), INTERVAL 30 DAY)";
         $result = db_query_handler($this->db, $SQL, true);
         foreach ($result->rows as $row)
         {
             $product_id = $row['product_id'];
-            usleep(rand(100000, 250000));
-            $SQL = "DELETE 
+            usleep(rand(30000, 100000));
+$SQL = "DELETE 
                     FROM `" . DB_PREFIX . "product_to_category`
                     WHERE `product_id` = " . (int)$product_id . " 
                         AND `category_id` = (SELECT category_id
@@ -679,6 +690,7 @@ class ModelExtensionApi4uProduct extends Model
         if (!$transaction_commit)
         {
             log_error('[Failed Transaction]', 'productsNewArrival');
+            $this->db->close();
             exit();
         }
     }
@@ -695,13 +707,11 @@ class ModelExtensionApi4uProduct extends Model
         if (!$transaction)
         {
             log_error('[Failed Transaction]', 'updateEshopActiveProducts');
+            $this->db->close();
             exit();
         }
-        usleep(rand(100000, 200000));
+        usleep(rand(30000, 100000));
         $SQL = null;
-        usleep(rand(100000, 250000));        
-
-        usleep(rand(100000, 200000));
         $SQL = "UPDATE `" . DB_PREFIX . "product`
                 SET `status` = 0
                 WHERE `api_custom_field` = " . (int)$store . " AND api_id NOT IN ($data[0])";
@@ -711,7 +721,11 @@ class ModelExtensionApi4uProduct extends Model
         if (!$transaction_commit)
         {
             log_error('[Failed Transaction]', 'updateEshopActiveProducts');
+            $this->db->close();
             exit();
+        } else {
+            // Close connection at the end.
+            $this->db->close();
         }
     }
 }
