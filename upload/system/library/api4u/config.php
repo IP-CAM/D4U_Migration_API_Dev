@@ -25,8 +25,8 @@ define('PRODUCTS_JSON_DATA_MAP_POINT', ['']);
 define('PRODUCTS_JSON_DATA_ENDPOINT', '');
 
 //Categories Inputs
-define('CATEGORIES_JSON_DATA_MAP_POINT', ['Data', 'ItemTreeCategories']);
-define('CATEGORIES_JSON_DATA_ENDPOINT', 'ItemCategories');
+define('CATEGORIES_JSON_DATA_MAP_POINT', ['']);
+define('CATEGORIES_JSON_DATA_ENDPOINT', '');
 
 
 //ERP Endpoints
