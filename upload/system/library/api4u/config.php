@@ -6,21 +6,28 @@ ini_set('error_reporting', E_ALL);
 define('API4U VERSION', '3.0.3.8');
 
 //ERP Parameters
+define('ERP_API_URL', '');
 define('API_CODE_0', '');
 // define('API_CODE_1', '');
 define('API_APP_NAME', '');
 define('API_DB_ALIAS', '');
 define('API_DB_USERNAME', '');
 define('API_DB_PASSWORD', '');
-define('API_PACKAGE_SIZE', '');
+define('API_PACKAGE_SIZE', '1000');
 
-//Configs
-define('NEEDS_LOGIN_TOKEN', false);
+//General Options 
+define('NEEDS_LOGIN_TOKEN', true);
 define('IS_POST_OR_GET', true);
-define('ERP_API_URL', '');
-define('INTEGRATE_PROCESS', array(""));
-// define('PRODUCTS_JSON_DATA_MAP_POINT', array("", ""));
+define('INTEGRATE_PROCESS', ['']);
+
+//Product Inputs
+define('PRODUCTS_JSON_DATA_MAP_POINT', ['']);
 define('PRODUCTS_JSON_DATA_ENDPOINT', '');
+
+//Categories Inputs
+define('CATEGORIES_JSON_DATA_MAP_POINT', ['Data', 'ItemTreeCategories']);
+define('CATEGORIES_JSON_DATA_ENDPOINT', 'ItemCategories');
+
 
 //ERP Endpoints
 define('ELOG_URL', ERP_API_URL.'/exesjson/elogin');

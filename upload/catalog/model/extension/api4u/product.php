@@ -17,29 +17,31 @@ class ModelExtensionApi4uProduct extends Model
     public function integrateProduct($data = array()): void
     {
         $store = 0;
-        if (empty($data))
-        {
+        if (empty($data)) {
             log_error("[API4U] Warning:", 'Empty data array on product.');
             return;
         }
 
         $transaction = $this->db->beginTransaction();
-        if (!$transaction)
-        {
+        if (!$transaction) {
             log_error('[Failed Transaction]', 'integrateProduct');
             $this->db->close();
             exit();
         }
 
-        if(!is_array($data)) $data = json_decode($data, TRUE);
-        foreach ($data as $value)
-        {
-            if(!is_array($value)) $value = json_decode($value, TRUE);
+        if (!is_array($data)) {
+            $data = json_decode($data, true);
+        }
+
+        foreach ($data as $value) {
+            if (!is_array($value)) {
+                $value = json_decode($value, true);
+            }
+
             $last_inserted_id = 0;
             $model = $value['ITEMCODE'] ?? null;
             $api_id = $value['ITEMID'] ?? null;
-            if (!isset($model) || !isset($api_id))
-            {
+            if (!isset($model) || !isset($api_id)) {
                 continue;
             }
 
@@ -54,11 +56,9 @@ class ModelExtensionApi4uProduct extends Model
             $stock_status_id = $quantity > 9 ? '7' : '8';
             //TODO image
             $image = isset($value['image']) ? 'catalog/product-upload/' . $value['image'] : 'no_image.png';
-            
-            if ($image != 'no_image.png')
-            {
-                if (!file_exists(DIR_IMAGE . $image))
-                {
+
+            if ($image != 'no_image.png') {
+                if (!file_exists(DIR_IMAGE . $image)) {
                     //If the main colour image does not exist take the image of the next colour.
                     $image = main_image_selection($this->db, $model, $image);
                 }
@@ -66,18 +66,19 @@ class ModelExtensionApi4uProduct extends Model
 
             $manufacturer_id = isset($value['itemManufacturerId']) ? "(SELECT `manufacturer_id` FROM " . DB_PREFIX . "manufacturer WHERE `api_id` = '" . $this->db->escape($value['itemManufacturerId']) . "' )" : '0';
             $shipping = $value['shipping'] ?? '1';
-            
-            if ($value['INITIALRTLPRICE'] != 0) { 
-                $price = $value['INITIALRTLPRICE']; 
+
+            if (!empty($value['INITIALRTLPRICE']) &&
+                $value['INITIALRTLPRICE'] != 0 &&
+                ($value['RETAILPRICE'] < $value['INITIALRTLPRICE'])) {
+                $price = $value['INITIALRTLPRICE'];
                 $special_price = $value['RETAILPRICE'];
-            }
-            else { 
+            } else {
                 $price = $value['RETAILPRICE'];
-                $special_price = null; 
+                $special_price = null;
             }
 
             $points = $value['points'] ?? '0';
-            $tax_class_id = $value['taxClassId'] ?? '0';
+            $tax_class_id = $value['VTCLCODE'] ?? '0';
             $weight = $value['weight'] ?? '0.00000000';
             $weight_class_id = $value['weight_class_id'] ?? '1';
             $length = $value['length'] ?? '0.00000000';
@@ -99,11 +100,10 @@ class ModelExtensionApi4uProduct extends Model
             $options = $value['options'] ?? array();
             $attribute = $value['attributes'] ?? array();
             $date_modified = $value['dateModified'] ?? 'NOW()';
-            if ($row = check_existence($this->db, DB_PREFIX . 'product', 'api_id', $api_id, 'api_id'))
-            {
+            if ($row = check_existence($this->db, DB_PREFIX . 'product', 'api_id', $api_id, 'api_id')) {
                 $order = $store ? 'DESC' : 'ASC';
                 usleep(rand(30000, 100000));
-$SQL = "UPDATE `" . DB_PREFIX . "product`
+                $SQL = "UPDATE `" . DB_PREFIX . "product`
                         SET `sku` = '" . $this->db->escape($sku) . "',
                             `upc` = '" . $this->db->escape($upc) . "',
                             `ean` = '" . $this->db->escape($ean) . "',
@@ -111,38 +111,36 @@ $SQL = "UPDATE `" . DB_PREFIX . "product`
                             `isbn`= '" . $this->db->escape($isbn) . "',
                             `mpn` = '" . $this->db->escape($mpn) . "',
                             `location` = '" . $this->db->escape($location) . "',
-                            `quantity` = '" . (int)$quantity . "',
+                            `quantity` = '" . (int) $quantity . "',
                             `model` = '" . $this->db->escape($model) . "',
                             `api_custom_field` = '$store',
-                            `stock_status_id` = '" . (int)$stock_status_id . "',
+                            `stock_status_id` = '" . (int) $stock_status_id . "',
                             `image` = '" . $this->db->escape($image) . "',
                             `manufacturer_id` = " . $manufacturer_id . ",
-                            `shipping` = '" . (int)$shipping . "',
-                            `price` = '" . (float)$price . "',
-                            `points` = '" . (int)$points . "', 
-                            `tax_class_id` = '" . (int)$tax_class_id . "',
-                            `date_available` = '".date('Y-m-d')."',
-                            `weight` = " . (float)$weight . ",
-                            `weight_class_id` = '" . (int)$weight_class_id . "',
-                            `length` = '" . (float)$length . "',
-                            `width` = '" . (float)$width . "',
-                            `height` = '" . (float)$height . "',
-                            `length_class_id` = '" . (int)$length_class_id . "',
+                            `shipping` = '" . (int) $shipping . "',
+                            `price` = '" . (float) $price . "',
+                            `points` = '" . (int) $points . "',
+                            `tax_class_id` = '" . (int) $tax_class_id . "',
+                            `date_available` = '" . date('Y-m-d') . "',
+                            `weight` = " . (float) $weight . ",
+                            `weight_class_id` = '" . (int) $weight_class_id . "',
+                            `length` = '" . (float) $length . "',
+                            `width` = '" . (float) $width . "',
+                            `height` = '" . (float) $height . "',
+                            `length_class_id` = '" . (int) $length_class_id . "',
                             `subtract` = $subtract,
-                            `minimum` = '" . (int)$minimum . "',
-                            `sort_order` = '" . (int)$sort_order . "',  
-                            `status` = '" . (int)$status . "',
-                            `viewed` = '" . (int)$viewed . "',
+                            `minimum` = '" . (int) $minimum . "',
+                            `sort_order` = '" . (int) $sort_order . "',
+                            `status` = '" . (int) $status . "',
+                            `viewed` = '" . (int) $viewed . "',
                             `date_modified` = " . $date_modified . "
                         WHERE `api_id` = '" . (string) $api_id . "'
                         LIMIT 1;";
                 db_query_handler($this->db, $SQL, true);
-            }
-            else
-            {
+            } else {
                 //Insert - Update product table
                 usleep(rand(30000, 100000));
-$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product`
+                $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product`
                         SET `model` = '" . $this->db->escape($model) . "',
                             `sku` = '" . $this->db->escape($sku) . "',
                             `upc` = '" . $this->db->escape($upc) . "',
@@ -151,57 +149,54 @@ $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product`
                             `isbn`= '" . $this->db->escape($isbn) . "',
                             `mpn` = '" . $this->db->escape($mpn) . "',
                             `location` = '" . $this->db->escape($location) . "',
-                            `quantity` = '" . (int)$quantity . "',
+                            `quantity` = '" . (int) $quantity . "',
                             `api_id` = '" . $this->db->escape($api_id) . "',
                             `api_custom_field` = '$store',
-                            `stock_status_id` = '" . (int)$stock_status_id . "',
+                            `stock_status_id` = '" . (int) $stock_status_id . "',
                             `image` = '" . $this->db->escape($image) . "',
                             `manufacturer_id` = " . $manufacturer_id . ",
-                            `shipping` = '" . (int)$shipping . "',
-                            `price` = '" . (float)$price . "',
-                            `points` = '" . (int)$points . "', 
-                            `tax_class_id` = '" . (int)$tax_class_id . "',
-                            `date_available` = '".date('Y-m-d')."',
-                            `weight` = " . (float)$weight . ",
-                            `weight_class_id` = '" . (int)$weight_class_id . "',
-                            `length` = '" . (float)$length . "',
-                            `width` = '" . (float)$width . "',
-                            `height` = '" . (float)$height . "',
-                            `length_class_id` = '" . (int)$length_class_id . "',
+                            `shipping` = '" . (int) $shipping . "',
+                            `price` = '" . (float) $price . "',
+                            `points` = '" . (int) $points . "',
+                            `tax_class_id` = '" . (int) $tax_class_id . "',
+                            `date_available` = '" . date('Y-m-d') . "',
+                            `weight` = " . (float) $weight . ",
+                            `weight_class_id` = '" . (int) $weight_class_id . "',
+                            `length` = '" . (float) $length . "',
+                            `width` = '" . (float) $width . "',
+                            `height` = '" . (float) $height . "',
+                            `length_class_id` = '" . (int) $length_class_id . "',
                             `subtract` = $subtract,
-                            `minimum` = '" . (int)$minimum . "',
-                            `sort_order` = '" . (int)$sort_order . "',  
-                            `status` = '" . (int)$status . "',
-                            `viewed` = '" . (int)$viewed . "',
+                            `minimum` = '" . (int) $minimum . "',
+                            `sort_order` = '" . (int) $sort_order . "',
+                            `status` = '" . (int) $status . "',
+                            `viewed` = '" . (int) $viewed . "',
                             `date_added` = NOW(),
                             `date_modified` = " . $date_modified . ";";
                 db_query_handler($this->db, $SQL, true);
-                $last_inserted_id = (int)$this->db->getLastId();
+                $last_inserted_id = (int) $this->db->getLastId();
             }
 
-            if (!$last_inserted_id)
-            {
+            if (!$last_inserted_id) {
                 usleep(rand(30000, 100000));
-$SQL = "SELECT `product_id`
+                $SQL = "SELECT `product_id`
                         FROM `" . DB_PREFIX . "product`
                         WHERE `api_id` = '" . $this->db->escape($api_id) . "'";
                 $result = db_query_handler($this->db, $SQL, true);
-                if (!$result->num_rows)
-                {
+                if (!$result->num_rows) {
                     continue;
                 }
 
-                $last_inserted_id = (int)$result->row['product_id'];
+                $last_inserted_id = (int) $result->row['product_id'];
             }
 
             //Insert - Update product_description table
             //This is compatible with two languages. It needs other approach to play correctly.
-            foreach ($this->language_ids as $key => $id)
-            {
+            foreach ($this->language_ids as $key => $id) {
                 $language_name = $key == 0 ? $foreign_name : $name;
                 $language_description = $key == 0 ? $foreign_description : $description;
                 usleep(rand(30000, 100000));
-$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_description`
+                $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_description`
                         SET `product_id` = '$last_inserted_id',
                             `language_id` = '$id',
                             `name` = '" . $this->db->escape($language_name) . "',
@@ -216,35 +211,30 @@ $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_description`
             }
 
             usleep(rand(30000, 100000));
-$SQL = "SELECT `product_special_id`
+            $SQL = "SELECT `product_special_id`
                     FROM `" . DB_PREFIX . "product_special`
                     WHERE `product_id` = '" . $last_inserted_id . "'
                     LIMIT 1;";
             $result = db_query_handler($this->db, $SQL, true);
-            if ($result->num_rows)
-            {
+            if ($result->num_rows) {
                 $date_end = isset($special_price) && $special_price > 0 ? '0000-00-00' : 'NOW()';
                 //Update product_special table
                 usleep(rand(30000, 100000));
-$SQL = "UPDATE `" . DB_PREFIX . "product_special`
+                $SQL = "UPDATE `" . DB_PREFIX . "product_special`
                         SET `price` = '$special_price',
                             `date_end` = $date_end
-                        WHERE `product_special_id` = " . (int)$last_inserted_id . ";";
+                        WHERE `product_special_id` = " . (int) $last_inserted_id . ";";
                 db_query_handler($this->db, $SQL, true);
-            }
-            else
-            {
-                foreach ($this->customer_group_ids as $id)
-                {
-                    if (isset($special_price))
-                    {
+            } else {
+                foreach ($this->customer_group_ids as $id) {
+                    if (isset($special_price)) {
                         //Insert product_special table
                         usleep(rand(30000, 100000));
-$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_special`
+                        $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_special`
                                 SET `product_id` = '$last_inserted_id',
                                     `priority` = 1,
                                     `price` = '$special_price',
-                                    `customer_group_id` = " . (int)$id . ",
+                                    `customer_group_id` = " . (int) $id . ",
                                     `date_start` = '0000-00-00',
                                     `date_end` = '0000-00-00';";
                         db_query_handler($this->db, $SQL, true);
@@ -254,22 +244,22 @@ $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_special`
 
             //Insert - Update product_to_store table
             usleep(rand(30000, 100000));
-$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_to_store`
+            $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_to_store`
                     SET `product_id` = '$last_inserted_id',
-                        `store_id` = " . (int)$store . ";";
+                        `store_id` = " . (int) $store . ";";
             db_query_handler($this->db, $SQL, true);
 
             //Insert - Update product_to_layout table
             usleep(rand(30000, 100000));
-$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_to_layout`
+            $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_to_layout`
                     SET `product_id` = '$last_inserted_id',
-                        `store_id` =  " . (int)$store . ",
+                        `store_id` =  " . (int) $store . ",
                         `layout_id` = 0;";
             db_query_handler($this->db, $SQL, true);
 
             //Insert product_to_category table
             usleep(rand(30000, 100000));
-$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_to_category`
+            $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_to_category`
                     SET `product_id` = '$last_inserted_id',
                         `category_id` = (SELECT category_id
                                          FROM `" . DB_PREFIX . "category`
@@ -277,15 +267,12 @@ $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_to_category`
             db_query_handler($this->db, $SQL, true);
 
             //Insert - Update product_attribute table
-            if (!empty($attribute))
-            {
-                foreach ($attribute as $attr)
-                {
-                    foreach ($this->language_ids as $key => $id)
-                    {
+            if (!empty($attribute)) {
+                foreach ($attribute as $attr) {
+                    foreach ($this->language_ids as $key => $id) {
                         $language_name = $key == 0 ? $attr['attributeForeignText'] : $attr['attributeText'];
                         usleep(rand(30000, 100000));
-$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_attribute`
+                        $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_attribute`
                                 SET `product_id` = '$last_inserted_id',
                                     `attribute_id` = (SELECT attribute_id
                                                       FROM `" . DB_PREFIX . "attribute`
@@ -301,10 +288,9 @@ $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_attribute`
             }
 
             //Insert - Insert product_filter table
-            foreach ($filters as $filter)
-            {
+            foreach ($filters as $filter) {
                 usleep(rand(30000, 100000));
-$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_filter`
+                $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_filter`
                         SET `product_id` = '$last_inserted_id',
                             `filter_id` = (SELECT filter_id
                                            FROM `" . DB_PREFIX . "filter`
@@ -313,31 +299,27 @@ $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_filter`
             }
 
             //Insert - Update product_option and product_option_value tables
-            foreach ($options as $option_key => $option)
-            {
+            foreach ($options as $option_key => $option) {
                 $last_inserted_product_option_id = 0;
                 $sku = $option['itemAlterCode'];
                 $quantity = $option['quantity'] ?? 0;
-                foreach ($option['option'] as $option_val)
-                {
-                    if (!isset($option_val['optionId']))
-                    {
+                foreach ($option['option'] as $option_val) {
+                    if (!isset($option_val['optionId'])) {
                         continue;
                     }
-                    
+
                     usleep(rand(30000, 100000));
-$SQL = "SELECT `product_option_id`
+                    $SQL = "SELECT `product_option_id`
                             FROM `" . DB_PREFIX . "product_option`
-                            WHERE `product_id` = '$last_inserted_id' 
+                            WHERE `product_id` = '$last_inserted_id'
                                 AND `option_id` = (
                                     SELECT option_id
                                     FROM `" . DB_PREFIX . "option`
                                     WHERE `api_id` = '" . $this->db->escape($option_val['optionId']) . "');";
                     $result = db_query_handler($this->db, $SQL, true);
-                    if (!$result->num_rows)
-                    {
+                    if (!$result->num_rows) {
                         usleep(rand(30000, 100000));
-$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_option`
+                        $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_option`
                                 SET `product_id` = '$last_inserted_id',
                                     `option_id` = (
                                         SELECT option_id
@@ -346,15 +328,15 @@ $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_option`
                                     `value` = '',
                                     `required` = 1;";
                         db_query_handler($this->db, $SQL, true);
-                        $last_inserted_product_option_id = (int)$this->db->getLastId();
+                        $last_inserted_product_option_id = (int) $this->db->getLastId();
                     }
 
                     $last_inserted_product_option_id = !$last_inserted_product_option_id ? $result->row['product_option_id'] : $last_inserted_product_option_id;
                     $option_value_api_key = $option_val['optionValueId'];
                     usleep(rand(30000, 100000));
-$SQL = "SELECT `product_option_value_id`, `api_filter_id`
+                    $SQL = "SELECT `product_option_value_id`, `api_filter_id`
                             FROM `" . DB_PREFIX . "product_option_value`
-                            WHERE `product_option_id` = '" . (int)$last_inserted_product_option_id . "' AND `product_id` = '$last_inserted_id' 
+                            WHERE `product_option_id` = '" . (int) $last_inserted_product_option_id . "' AND `product_id` = '$last_inserted_id'
                                 AND `option_id` = (
                                     SELECT option_id
                                     FROM `" . DB_PREFIX . "option`
@@ -363,23 +345,20 @@ $SQL = "SELECT `product_option_value_id`, `api_filter_id`
                                                          FROM `" . DB_PREFIX . "option_value`
                                                          WHERE `api_id` = '" . $this->db->escape($option_value_api_key) . "');";
                     $result = db_query_handler($this->db, $SQL, true);
-                    if ($result->num_rows)
-                    {
+                    if ($result->num_rows) {
                         usleep(rand(30000, 100000));
-$SQL = "UPDATE `" . DB_PREFIX . "product_option_value`
+                        $SQL = "UPDATE `" . DB_PREFIX . "product_option_value`
                                 SET `api_filter_id` = (SELECT api_filter_id
                                                        FROM `" . DB_PREFIX . "option_value`
                                                        WHERE `api_id` = '" . $this->db->escape($option_value_api_key) . "'
                                                        ),
                                     `subtract` = '" . $this->db->escape($subtract) . "',
-                                    `weight` = " . (float)$weight . "
-                                WHERE `product_option_value_id` = " . (int)$result->row['product_option_value_id'] . ";";
+                                    `weight` = " . (float) $weight . "
+                                WHERE `product_option_value_id` = " . (int) $result->row['product_option_value_id'] . ";";
                         db_query_handler($this->db, $SQL, true);
-                    }
-                    else
-                    {
+                    } else {
                         usleep(rand(30000, 100000));
-$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_option_value`
+                        $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_option_value`
                                 SET `product_option_id` = '$last_inserted_product_option_id',
                                     `product_id` = '$last_inserted_id',
                                     `option_id` = (SELECT option_id
@@ -398,7 +377,7 @@ $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_option_value`
                                     `price_prefix` = '',
                                     `points` = 0,
                                     `points_prefix` = '+',
-                                    `weight` = " . (float)$weight . ",
+                                    `weight` = " . (float) $weight . ",
                                     `weight_prefix` = '+';";
                         db_query_handler($this->db, $SQL, true);
                     }
@@ -407,8 +386,7 @@ $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_option_value`
         }
 
         $transaction_commit = $this->db->commitTransaction();
-        if (!$transaction_commit)
-        {
+        if (!$transaction_commit) {
             log_error('[Failed Transaction]', 'Update products operation failed.');
             $this->db->close();
             exit();
@@ -418,23 +396,19 @@ $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_option_value`
     public function integrateProductImage($store = 0): void
     {
         $transaction = $this->db->beginTransaction();
-        if (!$transaction)
-        {
+        if (!$transaction) {
             log_error('[Failed Transaction]', 'integrateProductImage');
             $this->db->close();
             exit();
         }
 
-        if (is_dir(IMAGES))
-        {
+        if (is_dir(IMAGES)) {
             $files = new RecursiveDirectoryIterator(IMAGES, RecursiveDirectoryIterator::SKIP_DOTS);
-            foreach (new RecursiveIteratorIterator($files) as $index => $file)
-            {
+            foreach (new RecursiveIteratorIterator($files) as $index => $file) {
                 $output_array = array();
                 $path = $file->getPathname();
                 $filename = $file->getFilename();
-                if (preg_match("/[$]DETAIL[0-9]/i", $filename, $output_array))
-                {
+                if (preg_match("/[$]DETAIL[0-9]/i", $filename, $output_array)) {
                     /*
                      * Table `product_image`
                      * If product image already exists, skip.
@@ -444,23 +418,21 @@ $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_option_value`
                     $sort = trim($output_array[0], '$DETAIL');
                     $exploded_path = explode('/image/', $path)[1];
                     usleep(rand(30000, 100000));
-$SQL = "SELECT `product_id`
+                    $SQL = "SELECT `product_id`
                             FROM `" . DB_PREFIX . "product`
-                            WHERE INSTR('" . $this->db->escape($model_and_colour) . "', `model`) AND `api_custom_field` = " . (int)$store . "
+                            WHERE INSTR('" . $this->db->escape($model_and_colour) . "', `model`) AND `api_custom_field` = " . (int) $store . "
                             LIMIT 1;";
                     $result = db_query_handler($this->db, $SQL, true);
                     $product_id = $result->row['product_id'] ?? 0;
-                    if (!$product_id)
-                    {
+                    if (!$product_id) {
                         continue;
                     }
 
                     $condition = "AND `product_id` = '$product_id' AND
                                  `api_id` IS NULL";
-                    if ($row = check_existence($this->db, DB_PREFIX . 'product_image', 'image', $this->db->escape($exploded_path), 'product_image_id', $condition))
-                    {
+                    if ($row = check_existence($this->db, DB_PREFIX . 'product_image', 'image', $this->db->escape($exploded_path), 'product_image_id', $condition)) {
                         usleep(rand(30000, 100000));
-$SQL = "UPDATE `" . DB_PREFIX . "product_image`
+                        $SQL = "UPDATE `" . DB_PREFIX . "product_image`
                                 SET `api_id` = '" . $this->db->escape($exploded_path) . "'
                                 WHERE `image` = '" . $this->db->escape($exploded_path) . "' $condition;";
                         db_query_handler($this->db, $SQL, true);
@@ -468,18 +440,17 @@ $SQL = "UPDATE `" . DB_PREFIX . "product_image`
                     }
 
                     usleep(rand(30000, 100000));
-$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_image` 
+                    $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_image`
                             SET `product_id` = '$product_id',
                                 `image` = '" . $this->db->escape($exploded_path) . "',
                                 `api_id` = '" . $this->db->escape($exploded_path) . "',
-                                `sort_order` = '" . (int)$sort . "';";
+                                `sort_order` = '" . (int) $sort . "';";
                     db_query_handler($this->db, $SQL, true);
                 }
             }
 
             $transaction_commit = $this->db->commitTransaction();
-            if (!$transaction_commit)
-            {
+            if (!$transaction_commit) {
                 log_error('[Failed Transaction]', 'integrateRelatedOptionImage');
                 exit();
             }
@@ -488,28 +459,24 @@ $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_image`
 
     public function integrateProductDescription(): void
     {
-        if (empty($data))
-        {
+        if (empty($data)) {
             log_error("[API4U] Warning:", 'Empty data array on product update description.');
             return;
         }
 
         $transaction = $this->db->beginTransaction();
-        if (!$transaction)
-        {
+        if (!$transaction) {
             log_error('[Failed Transaction]', 'integrateProductDescription');
             $this->db->close();
             exit();
         }
-          usleep(rand(30000, 100000));
-$SQL = null;
-        foreach ($data as $value)
-        {
+        usleep(rand(30000, 100000));
+        $SQL = null;
+        foreach ($data as $value) {
             $api_id = $value['itemID'] >> null;
             $description = $value['itemDescription'] ?? null;
             $foreign_description = $value['itemForeignDescription'] ?? null;
-            if (!isset($api_id) || !isset($description))
-            {
+            if (!isset($api_id) || !isset($description)) {
                 continue;
             }
 
@@ -517,23 +484,21 @@ $SQL = null;
              * Table `product_description`
              * Update product_description table.
              */
-            foreach ($this->language_ids as $key => $id)
-            {
+            foreach ($this->language_ids as $key => $id) {
 
                 $language_description = $key == 0 ? $foreign_description : $description;
                 usleep(rand(30000, 100000));
-$SQL = "UPDATE `" . DB_PREFIX . "product_description`
+                $SQL = "UPDATE `" . DB_PREFIX . "product_description`
                         SET `description` = '" . $this->db->escape($language_description) . "'
                         WHERE `product_id` = (SELECT `product_id`
                                               FROM `" . DB_PREFIX . "product`
-                                              WHERE `api_id` = '" . $this->db->escape($api_id) . "') AND language_id = " . (int)$id . ";";
+                                              WHERE `api_id` = '" . $this->db->escape($api_id) . "') AND language_id = " . (int) $id . ";";
                 db_query_handler($this->db, $SQL, true);
             }
         }
 
         $transaction_commit = $this->db->commitTransaction();
-        if (!$transaction_commit)
-        {
+        if (!$transaction_commit) {
             log_error('[Failed Transaction]', 'integrateProductDescription');
             $this->db->close();
             exit();
@@ -543,53 +508,47 @@ $SQL = "UPDATE `" . DB_PREFIX . "product_description`
     /*
      * Data structure.
      * $data = array(
-        "product apiId" => array(
-            "options" => array(
-                "options" => array(
-                    "optionColourApiId" => array("optionValueApiId" => "option value quantity"),
-                    "optionSizeApiId" => array("optionValueApiId" => "option value quantity")
-                ),
-                "quantity" => "Product quantity"
-            )
-        )
-       );
-    */
+    "product apiId" => array(
+    "options" => array(
+    "options" => array(
+    "optionColourApiId" => array("optionValueApiId" => "option value quantity"),
+    "optionSizeApiId" => array("optionValueApiId" => "option value quantity")
+    ),
+    "quantity" => "Product quantity"
+    )
+    )
+    );
+     */
     public function integrateProductsQuantityAndOptions($data = array()): void
     {
-        if (empty($data))
-        {
+        if (empty($data)) {
             log_error("[API4U] Warning:", 'Empty data array on product update quantity and options.');
             return;
         }
 
         $transaction = $this->db->beginTransaction();
-        if (!$transaction)
-        {
+        if (!$transaction) {
             log_error('[Failed Transaction]', 'integrateProductsQuantityAndOptions');
             $this->db->close();
             exit();
         }
-          usleep(rand(30000, 100000));
-$SQL = null;
-        foreach ($data as $product_api_id => $value)
-        {
-            if (!isset($product_api_id))
-            {
+        usleep(rand(30000, 100000));
+        $SQL = null;
+        foreach ($data as $product_api_id => $value) {
+            if (!isset($product_api_id)) {
                 continue;
             }
 
             $quantity = $value['quantity'] ?? 0;
             $stock_status_id = $quantity > 0 ? '7' : '5';
             $status = $quantity > 0 ? 1 : 0;
-            if ($status)
-            {
+            if ($status) {
                 usleep(rand(30000, 100000));
-$SQL = "SELECT `image`
+                $SQL = "SELECT `image`
                         FROM `" . DB_PREFIX . "product`
                         WHERE  `api_id` = '" . $this->db->escape($product_api_id) . "';";
                 $result = db_query_handler($this->db, $SQL, true);
-                if ($result->num_rows)
-                {
+                if ($result->num_rows) {
                     $image = $result->row['image'];
                     $status = file_exists(DIR_IMAGE . $image) && $image != 'no_image.png' ? $status : 0;
                 }
@@ -600,24 +559,22 @@ $SQL = "SELECT `image`
              * Update product table quantity.
              */
             usleep(rand(30000, 100000));
-$SQL = "UPDATE `" . DB_PREFIX . "product`
-                    SET `quantity` = " . (int)$quantity . ",
-                        `stock_status_id` = " . (int)$stock_status_id . ",
-                        `status` = " . (int)$status . "
+            $SQL = "UPDATE `" . DB_PREFIX . "product`
+                    SET `quantity` = " . (int) $quantity . ",
+                        `stock_status_id` = " . (int) $stock_status_id . ",
+                        `status` = " . (int) $status . "
                     WHERE `api_id` = '" . $this->db->escape($product_api_id) . "';";
             db_query_handler($this->db, $SQL, true);
 
-            foreach ($value['options'] as $option_api_id => $option_value)
-            {
-                foreach ($option_value as $option_value_api_id => $quantity)
-                {
+            foreach ($value['options'] as $option_api_id => $option_value) {
+                foreach ($option_value as $option_value_api_id => $quantity) {
                     /*
                      * Table `product_option_value`
                      * Update product_option_value table quantity.
                      */
                     usleep(rand(30000, 100000));
-$SQL = "UPDATE `" . DB_PREFIX . "product_option_value`
-                            SET `quantity` = " . (int)$quantity . "
+                    $SQL = "UPDATE `" . DB_PREFIX . "product_option_value`
+                            SET `quantity` = " . (int) $quantity . "
                             WHERE `product_id` = (SELECT `product_id`
                                                 FROM `" . DB_PREFIX . "product`
                                                 WHERE `api_id` = '" . $this->db->escape($product_api_id) . "') AND
@@ -633,8 +590,7 @@ $SQL = "UPDATE `" . DB_PREFIX . "product_option_value`
         }
 
         $transaction_commit = $this->db->commitTransaction();
-        if (!$transaction_commit)
-        {
+        if (!$transaction_commit) {
             log_error('[Failed Transaction]', 'integrateProductsQuantityAndOptions');
             $this->db->close();
             exit();
@@ -644,41 +600,38 @@ $SQL = "UPDATE `" . DB_PREFIX . "product_option_value`
     public function productsNewArrival($store = 0): void
     {
         $transaction = $this->db->beginTransaction();
-        if (!$transaction)
-        {
+        if (!$transaction) {
             log_error('[Failed Transaction]', 'productsNewArrival');
             $this->db->close();
             exit();
         }
-          usleep(rand(30000, 100000));
-$SQL = "SELECT `product_id`
+        usleep(rand(30000, 100000));
+        $SQL = "SELECT `product_id`
                 FROM `" . DB_PREFIX . "product`
-                WHERE `api_custom_field` = " . (int)$store . " AND `date_added` > DATE_SUB(NOW(), INTERVAL 30 DAY)";
+                WHERE `api_custom_field` = " . (int) $store . " AND `date_added` > DATE_SUB(NOW(), INTERVAL 30 DAY)";
         $result = db_query_handler($this->db, $SQL, true);
-        foreach ($result->rows as $row)
-        {
+        foreach ($result->rows as $row) {
             $product_id = $row['product_id'];
             usleep(rand(30000, 100000));
-$SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_to_category`
-                    SET `product_id` = " . (int)$product_id . ",
+            $SQL = "INSERT IGNORE INTO `" . DB_PREFIX . "product_to_category`
+                    SET `product_id` = " . (int) $product_id . ",
                         `category_id` = (SELECT category_id
                                          FROM `" . DB_PREFIX . "category_description`
                                          WHERE `name` = 'Νεες Αφίξεις'
                                          LIMIT 1);";
             db_query_handler($this->db, $SQL, true);
         }
-          usleep(rand(30000, 100000));
-$SQL = "SELECT `product_id`
+        usleep(rand(30000, 100000));
+        $SQL = "SELECT `product_id`
                 FROM `" . DB_PREFIX . "product`
-                WHERE `api_custom_field` = " . (int)$store . " AND `date_added` < DATE_SUB(NOW(), INTERVAL 30 DAY)";
+                WHERE `api_custom_field` = " . (int) $store . " AND `date_added` < DATE_SUB(NOW(), INTERVAL 30 DAY)";
         $result = db_query_handler($this->db, $SQL, true);
-        foreach ($result->rows as $row)
-        {
+        foreach ($result->rows as $row) {
             $product_id = $row['product_id'];
             usleep(rand(30000, 100000));
-$SQL = "DELETE 
+            $SQL = "DELETE
                     FROM `" . DB_PREFIX . "product_to_category`
-                    WHERE `product_id` = " . (int)$product_id . " 
+                    WHERE `product_id` = " . (int) $product_id . "
                         AND `category_id` = (SELECT category_id
                                              FROM `" . DB_PREFIX . "category_description`
                                              WHERE `name` = 'Νεες Αφίξεις'
@@ -687,8 +640,7 @@ $SQL = "DELETE
         }
 
         $transaction_commit = $this->db->commitTransaction();
-        if (!$transaction_commit)
-        {
+        if (!$transaction_commit) {
             log_error('[Failed Transaction]', 'productsNewArrival');
             $this->db->close();
             exit();
@@ -697,15 +649,13 @@ $SQL = "DELETE
 
     public function updateEshopActiveProducts($store, $data = array()): void
     {
-        if (empty($data))
-        {
+        if (empty($data)) {
             log_error("[API4U] Warning:", 'Empty data array on active product update.');
             return;
         }
 
         $transaction = $this->db->beginTransaction();
-        if (!$transaction)
-        {
+        if (!$transaction) {
             log_error('[Failed Transaction]', 'updateEshopActiveProducts');
             $this->db->close();
             exit();
@@ -714,12 +664,11 @@ $SQL = "DELETE
         $SQL = null;
         $SQL = "UPDATE `" . DB_PREFIX . "product`
                 SET `status` = 0
-                WHERE `api_custom_field` = " . (int)$store . " AND api_id NOT IN ($data[0])";
+                WHERE `api_custom_field` = " . (int) $store . " AND api_id NOT IN ($data[0])";
         db_query_handler($this->db, $SQL, true);
 
         $transaction_commit = $this->db->commitTransaction();
-        if (!$transaction_commit)
-        {
+        if (!$transaction_commit) {
             log_error('[Failed Transaction]', 'updateEshopActiveProducts');
             $this->db->close();
             exit();

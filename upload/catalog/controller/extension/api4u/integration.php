@@ -49,22 +49,23 @@ class ControllerApi4uIntegration extends Controller
         }
     }
 
-    public function integrationProcess(string $process) {
-        if(stripos($process, 'prod') !== false) { $this->integrateProducts(); }
-        if(stripos($process, 'relat') !== false) { $this->integrateRelatedOptions(); }
-        if(stripos($process, 'categor') !== false) { $this->integrateCategories(); }
-        if(stripos($process, 'attrib') !== false) { $this->integrateAttributeGroups(); }
-        if(stripos($process, 'group') !== false) { $this->integrateFilterGroups(); }
-        if(stripos($process, 'filte') !== false) { $this->integrateFilters(); }
-        if(stripos($process, 'option') !== false) { $this->integrateOptions(); }
-        if(stripos($process, 'value') !== false) { $this->integrateOptionValues(); }
-        if(stripos($process, 'manuf') !== false) { $this->integrateManufacturers(); }
-        if(stripos($process, 'descr') !== false) { $this->integrateProductsDescription(); }
+    public function integrationProcess(string $process)
+    {
+        if (stripos($process, 'prod') !== false) {$this->integrateProducts();}
+        if (stripos($process, 'relat') !== false) {$this->integrateRelatedOptions();}
+        if (stripos($process, 'categor') !== false) {$this->integrateCategories();}
+        if (stripos($process, 'attrib') !== false) {$this->integrateAttributeGroups();}
+        if (stripos($process, 'group') !== false) {$this->integrateFilterGroups();}
+        if (stripos($process, 'filte') !== false) {$this->integrateFilters();}
+        if (stripos($process, 'option') !== false) {$this->integrateOptions();}
+        if (stripos($process, 'value') !== false) {$this->integrateOptionValues();}
+        if (stripos($process, 'manuf') !== false) {$this->integrateManufacturers();}
+        if (stripos($process, 'descr') !== false) {$this->integrateProductsDescription();}
 
-        if(stripos($process, 'active') !== false || stripos($process, 'shop') !== false) { $this->updateEshopActiveProducts($store); }
-        if(stripos($process, 'order') !== false) { $this->postOrders($store); }
-        if(stripos($process, 'ship') !== false) { $this->shippedOrders($store); }
-        if(stripos($process, 'excel') !== false || stripos($process, 'export') !== false) { $this->exportExcel($store); }
+        if (stripos($process, 'active') !== false || stripos($process, 'shop') !== false) {$this->updateEshopActiveProducts($store);}
+        if (stripos($process, 'order') !== false) {$this->postOrders($store);}
+        if (stripos($process, 'ship') !== false) {$this->shippedOrders($store);}
+        if (stripos($process, 'excel') !== false || stripos($process, 'export') !== false) {$this->exportExcel($store);}
 
         $this->active_api_ids = array();
     }
@@ -74,7 +75,7 @@ class ControllerApi4uIntegration extends Controller
         $this->active_integration = false;
         $this->data_array = $this->prepareData($store);
 
-        if(NEEDS_LOGIN_TOKEN == true) {
+        if (NEEDS_LOGIN_TOKEN == true) {
             $token_bool = $this->checkToken($this->data_array['check_token']);
             if (!$token_bool) {
                 $login_response = $this->login($this->data_array['login']);
@@ -89,7 +90,7 @@ class ControllerApi4uIntegration extends Controller
                 }
             }
         } else {
-            $login_response = $this->login($this->data_array['login']);   
+            $login_response = $this->login($this->data_array['login']);
             if (!empty($login_response)) {
                 $this->token = $login_response['token'];
                 $this->data_array = $this->prepareData($store);
@@ -102,9 +103,9 @@ class ControllerApi4uIntegration extends Controller
         }
 
         $integrate_process = INTEGRATE_PROCESS;
-        if(is_array($integrate_process)) {
-            if(!empty($integrate_process[1])) {
-                foreach($integrate_process as $process) {
+        if (is_array($integrate_process)) {
+            if (!empty($integrate_process[1])) {
+                foreach ($integrate_process as $process) {
                     $this->integrationProcess($process);
                 }
             } else {
@@ -162,7 +163,7 @@ class ControllerApi4uIntegration extends Controller
         $data_array['get_data_categories'] = array(
             "cookie" => $this->token,
             "apicode" => $api_code,
-            "entitycode" => "InterCompCateg",
+            "entitycode" => CATEGORIES_JSON_DATA_ENDPOINT,
             "packagenumber" => $this->package_number,
             "packagesize" => API_PACKAGE_SIZE,
         );
@@ -228,17 +229,36 @@ class ControllerApi4uIntegration extends Controller
     //Start Integration procedures <<
     public function integrateCategories(): void
     {
-//        $response = $this->getData($this->data_array['get_data_categories']);
-        $response = "{\"Data\": [{\"categoryId\": \"0c-0c-0c-0c\", \"categoryParentId\": null, \"categoryName\": \"Μπλούζες\", \"categoryForeignName\": \"Shirts\"},{\"categoryId\": \"1c-1c-1c-1c\",  \"categoryParentId\": \"0c-0c-0c-0c\", \"categoryName\": \"Πόλο\", \"categoryForeignName\": \"Polo\"}]}";
-        if (!is_array($response)) $response = json_decode($response, true);
-        if (empty($response) && $this->package_number == 1) {
-            log_error("[API4U] Error:", 'Categories response is empty.');
-            return;
+        $flag = 0;
+        $response = $this->getData($this->data_array['get_data_categories']);
+        if (!empty(CATEGORIES_JSON_DATA_MAP_POINT[0]) && !empty(CATEGORIES_JSON_DATA_MAP_POINT[1])) {
+            $index = CATEGORIES_JSON_DATA_MAP_POINT;
+            $categoriesDetails = $response[$index[0]][$index[1]];
+        } else if (!empty(CATEGORIES_JSON_DATA_MAP_POINT[0])) {
+            $index = CATEGORIES_JSON_DATA_MAP_POINT;
+            $categoriesDetails = $response[$index[0]];
+        } else {
+            // $categoriesDetails = $response["Data"]["ItemTreeCategories"];
+            log_error("[API4U] Error:", 'EVERYTHING IS WRONG.');
+            die;
         }
 
-        if (!empty($response)) {
+        if (!empty($categoriesDetails)) {
+            if (!is_array($response)) {
+                $response = json_decode($response, true);
+            }
+
+            $this->data_array['get_data_categories']['packagenumber']++;
             $this->active_integration = true;
-            $this->model_extension_api4u_category->integrateCategory($response['Data']);
+            $this->model_extension_api4u_category->integrateCategory($categoriesDetails);
+
+            $this->integrateCategories();
+        } else {
+            $flag++;
+        }
+        if ($flag > 2) {
+            log_error("[API API4U] Error:", 'Api get products response is empty.');
+            return;
         }
     }
 
@@ -246,7 +266,10 @@ class ControllerApi4uIntegration extends Controller
     {
         //        $response = $this->getData($this->data_array[]);
         $response = "{\r\n  \"Data\": [\r\n    {\r\n      \"attributeGroupID\": \"1at-1at-1at-1at\",\r\n      \"attributeGroupName\": \"Σεζόν\",\r\n      \"attributeGroupForeignName\": \"Season\"\r\n    },\r\n    {\r\n      \"attributeGroupID\": \"2at-2at-2at-2at\",\r\n      \"attributeGroupName\": \"Σύνθεση\",\r\n      \"attributeGroupForeignName\": \"Composition\"\r\n    }\r\n  ]\r\n}";
-        if (!is_array($response)) $response = json_decode($response, true);
+        if (!is_array($response)) {
+            $response = json_decode($response, true);
+        }
+
         if (empty($response) && $this->package_number == 1) {
             log_error("[API4U] Error:", 'Attribute group response is empty.');
             return;
@@ -262,7 +285,10 @@ class ControllerApi4uIntegration extends Controller
     {
         //        $response = $this->getData($this->data_array[]);
         $response = "{\r\n  \"Data\": [\r\n    {\r\n      \"attributeID\": \"1a1a1a1a\",\r\n      \"attributeGroupID\": \"1at-1at-1at-1at\",\r\n      \"attributeName\": \"Καλοκαίρι 2022\",\r\n      \"attributeForeignName\": \"Summer 2022\"\r\n    },\r\n    {\r\n      \"attributeID\": \"2a2a2a2a\",\r\n      \"attributeGroupID\": \"2at-2at-2at-2at\",\r\n      \"attributeName\": \"Μαλλί\",\r\n      \"attributeForeignName\": \"Wool\"\r\n    },\r\n    {\r\n      \"attributeID\": \"3a3a3a3a\",\r\n      \"attributeGroupID\": \"1at-1at-1at-1at\",\r\n      \"attributeName\": \"Χειμώνας 2022\",\r\n      \"attributeForeignName\": \"Winter 2022\"\r\n    }\r\n  ]\r\n}";
-        if (!is_array($response)) $response = json_decode($response, true);
+        if (!is_array($response)) {
+            $response = json_decode($response, true);
+        }
+
         if (empty($response) && $this->package_number == 1) {
             log_error("[API4U] Error:", 'Attribute response is empty.');
             return;
@@ -278,7 +304,10 @@ class ControllerApi4uIntegration extends Controller
     {
         //        $response = $this->getData($this->data_array[]);
         $response = "{\r\n  \"Data\": [\r\n    {\r\n      \"filterGroupID\": \"11111\",\r\n      \"filterGroupName\": \"Χρώμα\",\r\n      \"filterGroupForeignName\": \"Color\"\r\n    }\r\n  ]\r\n}";
-        if (!is_array($response)) $response = json_decode($response, true);
+        if (!is_array($response)) {
+            $response = json_decode($response, true);
+        }
+
         if (empty($response) && $this->package_number == 1) {
             log_error("[API4U] Error:", 'Filters group response is empty.');
             return;
@@ -294,7 +323,10 @@ class ControllerApi4uIntegration extends Controller
     {
 //        $response = $this->getData($this->data_array[]);
         $response = "{\r\n  \"Data\": [\r\n    {\r\n      \"filterID\": \"1f-1f-1f-1f\",\r\n      \"filterGroupID\": \"11111\",\r\n      \"filterName\": \"Μπλε\",\r\n      \"filterForeignName\": \"Blue\"\r\n    }\r\n  ]\r\n}";
-        if (!is_array($response)) $response = json_decode($response, true);
+        if (!is_array($response)) {
+            $response = json_decode($response, true);
+        }
+
         if (empty($response) && $this->package_number == 1) {
             log_error("[API4U] Error:", 'Filters response is empty.');
             return;
@@ -310,7 +342,10 @@ class ControllerApi4uIntegration extends Controller
     {
         //        $response = $this->getData($this->data_array[]);
         $response = "{\r\n  \"Data\": [\r\n    {\r\n      \"manufacturerId\": \"1man-1man-1man-1man\",\r\n      \"manufacturerName\": \"ZARA\"\r\n    }\r\n  ]\r\n}";
-        if (!is_array($response)) $response = json_decode($response, true);
+        if (!is_array($response)) {
+            $response = json_decode($response, true);
+        }
+
         if (empty($response) && $this->package_number == 1) {
             log_error("[API4U] Error:", 'Manufacturers response is empty.');
             return;
@@ -326,7 +361,10 @@ class ControllerApi4uIntegration extends Controller
     {
 //        $response = $this->getData($this->data_array[]);
         $response = "{\r\n  \"Data\": [\r\n    {\r\n      \"optionId\": \"11111\",\r\n      \"optionName\": \"Μέγεθος\",\r\n      \"optionForeignName\": \"Size\"\r\n    },\r\n    {\r\n      \"optionId\": \"22222\",\r\n      \"optionName\": \"Χρώμα\",\r\n      \"optionForeignName\": \"Color\"\r\n    }\r\n  ]\r\n}";
-        if (!is_array($response)) $response = json_decode($response, true);
+        if (!is_array($response)) {
+            $response = json_decode($response, true);
+        }
+
         if (empty($response) && $this->package_number == 1) {
             log_error("[API4U] Error:", 'Options response is empty.');
             return;
@@ -342,7 +380,10 @@ class ControllerApi4uIntegration extends Controller
     {
 //        $response = $this->getData($this->data_array[]);
         $response = "{\r\n  \"Data\": [\r\n    {\r\n      \"optionValueId\": \"1o-1o-1o-1o\",\r\n      \"optionId\": \"22222\",\r\n      \"filterId\": \"1f-1f-1f-1f\",\r\n      \"optionValueName\": \"Απαλό Μπλέ\",\r\n      \"optionValueForeignName\": \"Light blue\"\r\n    },\r\n    {\r\n      \"optionValueId\": \"2o-2o-2o-2o\",\r\n      \"optionId\": \"22222\",\r\n      \"optionValueName\": \"ZARA/Καφέ\",\r\n      \"optionValueForeignName\": \"ZARA/Brown\"\r\n    },\r\n    {\r\n      \"optionValueId\": \"3o-3o-3o-3o\",\r\n      \"optionId\": \"22222\",\r\n      \"filterId\": \"1f-1f-1f-1f\",\r\n      \"optionValueName\": \"Απαλό Κόκκινο\",\r\n      \"optionValueForeignName\": \"Light Red\"\r\n    },\r\n    {\r\n      \"optionValueId\": \"4o-4o-4o-4o\",\r\n      \"optionId\": \"11111\",\r\n      \"optionValueName\": \"S\",\r\n      \"optionValueForeignName\": \"S\"\r\n    }\r\n  ]\r\n}";
-        if (!is_array($response)) $response = json_decode($response, true);
+        if (!is_array($response)) {
+            $response = json_decode($response, true);
+        }
+
         if (empty($response) && $this->package_number == 1) {
             log_error("[API4U] Error:", 'Option values response is empty.');
             return;
@@ -358,36 +399,26 @@ class ControllerApi4uIntegration extends Controller
     {
         $flag = 0;
         $response = $this->getData($this->data_array['get_products']);
-        $productsDetails = $response["Data"]["Items"];
+        if (!empty(PRODUCTS_JSON_DATA_MAP_POINT[0]) && !empty(PRODUCTS_JSON_DATA_MAP_POINT[1])) {
+            $index = PRODUCTS_JSON_DATA_MAP_POINT;
+            $categoriesDetails = $response[$index[0]][$index[1]];
+        } else if (!empty(PRODUCTS_JSON_DATA_MAP_POINT[0])) {
+            $index = PRODUCTS_JSON_DATA_MAP_POINT;
+            $categoriesDetails = $response[$index[0]];
+        } else {
+            // $categoriesDetails = $response["Data"]["Items"];
+            log_error("[API4U] Error:", 'EVERYTHING IS WRONG.');
+            die;
+        }
 
-        // Feature: Use PRODUCTS_JSON_DATA_MAP_POINT to point the array/json where the data are store, via config.php
-        // $productsDetails = null;
-        // $end_point = PRODUCTS_JSON_DATA_MAP_POINT;
-        
-        // if (!empty($end_point) && is_array($end_point)) {
-        //     if (!empty($end_point[1])) {
-        //         if(!empty($response[$end_point[0]][$end_point[1]])) {
-        //             $productsDetails = $response[(string) $end_point[0]][(string) $end_point[1]];
-        //         } else {
-        //             log_error("[API API4U] Error:", 'Please fill $end_point at "config.php", to know where do we find the Products data.'); return;
-        //         }
-        //     } else if (!empty($end_point[0])) {
-        //         if(!empty($response[$end_point[0]])) {
-        //             $productsDetails = $response[(string) $end_point[0]];
-        //         } else {
-        //             log_error("[API API4U] Error:", 'Please fill $end_point at "config.php", to know where do we find the Products data.'); return;
-        //         }
-        //     }
-        //     else log_error("[API API4U] Error:", 'Please fill $end_point at "config.php", to know where do we find the Products data.'); return;
-        // } else if (is_null($productsDetails)) {
-        //     log_error("[API API4U] Error:", 'Please fill $end_point at "config.php", to know where to find the Products data.'); return;
-        // }
+        if (!empty($categoriesDetails)) {
+            if (!is_array($response)) {
+                $response = json_decode($response, true);
+            }
 
-        if (!empty($productsDetails)) {
-            if (!is_array($response)) $response = json_decode($response, true);
             $this->data_array['get_products']['packagenumber']++;
             $this->active_integration = true;
-            $this->model_extension_api4u_product->integrateProduct($productsDetails);
+            $this->model_extension_api4u_product->integrateProduct($categoriesDetails);
             // $this->model_extension_api4u_product->integrateProductImage();
             // $this->model_extension_api4u_product->productsNewArrival();
 
@@ -405,7 +436,10 @@ class ControllerApi4uIntegration extends Controller
     {
 //        $response = $this->getData($this->data_array['get_products_description']);
         $response = "{\r\n  \"Data\": [\r\n    {\r\n      \"itemID\": \"11111-11111-11111-11111\",\r\n      \"itemDescription\": \"Πολύ καλή μπλούζα\",\r\n      \"itemForeignDescription\": \"Very good shirt\"\r\n    }\r\n  ]\r\n}";
-        if (!is_array($response)) $response = json_decode($response, true);
+        if (!is_array($response)) {
+            $response = json_decode($response, true);
+        }
+
         if (empty($response) && $this->package_number == 1) {
             log_error("[API API4U] Warning:", 'Api get products description response is empty.');
             return;
@@ -421,7 +455,10 @@ class ControllerApi4uIntegration extends Controller
     {
 //        $response = $this->getData($this->data_array[]);
         $response = "{\r\n  \"Data\": [\r\n    {\r\n      \"itemID\": \"11111-11111-11111-11111\",\r\n      \"itemAlterCode\": \"252525252525\",\r\n      \"options\": [\r\n        {\r\n          \"optionId\": \"22222\",\r\n          \"optionValueId\": \"1o-1o-1o-1o\"\r\n        },\r\n        {\r\n          \"optionId\": \"11111\",\r\n          \"optionValueId\": \"4o-4o-4o-4o\"\r\n        }\r\n      ],\r\n      \"quantity\": \"5\"\r\n    }\r\n  ]\r\n}";
-        if (!is_array($response)) $response = json_decode($response, true);
+        if (!is_array($response)) {
+            $response = json_decode($response, true);
+        }
+
         if (empty($response) && $this->package_number == 1) {
             log_error("[API API4U] Warning:", 'Api get items quantity response is empty.');
             return;
